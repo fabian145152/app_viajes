@@ -4,6 +4,73 @@ DROP DATABASE IF EXISTS "app_viajes";
 CREATE DATABASE "app_viajes";
 \connect "app_viajes";
 
+DROP TABLE IF EXISTS "autorizantes";
+DROP SEQUENCE IF EXISTS "public".autorizantes_id_seq;
+CREATE SEQUENCE "public".autorizantes_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."autorizantes" (
+    "id" integer DEFAULT nextval('autorizantes_id_seq') NOT NULL,
+    "nombre" character varying NOT NULL,
+    "apellido" character varying NOT NULL,
+    "cel" character varying(20),
+    "email" character varying NOT NULL,
+    "id_empresa" integer,
+    CONSTRAINT "autorizantes_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+INSERT INTO "autorizantes" ("id", "nombre", "apellido", "cel", "email", "id_empresa") VALUES
+(1,	'ARTURO',	'MOSTES',	'1145678965',	'montes@gmail.com',	1),
+(2,	'JORGE',	'TARGA',	'1145789645',	'targa@gmail.com',	1),
+(3,	'MARIA',	'SANTILLAN',	'1123568956',	'maria_santillan@gmail.com',	2);
+
+DROP TABLE IF EXISTS "choferes";
+DROP SEQUENCE IF EXISTS "public".choferes_id_seq;
+CREATE SEQUENCE "public".choferes_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."choferes" (
+    "id" integer DEFAULT nextval('choferes_id_seq') NOT NULL,
+    "nombre" character varying NOT NULL,
+    "apellido" character varying NOT NULL,
+    "cel" integer,
+    "dir" character varying,
+    "barrio" character varying,
+    "cp" integer,
+    CONSTRAINT "choferes_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+INSERT INTO "choferes" ("id", "nombre", "apellido", "cel", "dir", "barrio", "cp") VALUES
+(3,	'MARIA ROSA',	'YORIO',	NULL,	NULL,	NULL,	NULL),
+(2,	'ARTURO',	'COPES',	1125895689,	'Camacua 2025',	'Villa Crespo',	1604),
+(4,	'FABIAN',	'NOGUEROLES',	1169356236,	'CARLOS GARDEL 3296',	'V. LIBERTAD SAN MARTIN',	1650),
+(1,	'JUAN CARLOS',	'PEREZ',	1154873265,	'CAMPICHUELO 2025',	'ONCE',	1401);
+
+DROP TABLE IF EXISTS "cuenta_empresa";
+DROP SEQUENCE IF EXISTS "public".empresa_id_seq;
+CREATE SEQUENCE "public".empresa_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."cuenta_empresa" (
+    "id" integer DEFAULT nextval('empresa_id_seq') NOT NULL,
+    "razon_social" character varying NOT NULL,
+    "dir" character varying NOT NULL,
+    "cuit" character varying NOT NULL,
+    "inc_brutos" character varying NOT NULL,
+    "cel_1" integer,
+    "cel_2" integer,
+    "cel_3" character varying NOT NULL,
+    "contacto_1" character varying NOT NULL,
+    "contacto_2" character varying NOT NULL,
+    "contacto_3" character varying NOT NULL,
+    "numero_cuenta" integer NOT NULL,
+    CONSTRAINT "empresa_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+INSERT INTO "cuenta_empresa" ("id", "razon_social", "dir", "cuit", "inc_brutos", "cel_1", "cel_2", "cel_3", "contacto_1", "contacto_2", "contacto_3", "numero_cuenta") VALUES
+(1,	'AZ PLUS',	'JUAN B JUSTO 7730',	'30707651934',	'30707651934',	1145784512,	NULL,	'',	'JUAN PEREZ',	'',	'',	100),
+(2,	'HTAL ITALIANO',	'GURRUCHAGA 2025',	'2014758911',	'2014758911',	1154659865,	NULL,	'',	'CARLOS PIRINCHO',	'',	'',	201);
+
 DROP TABLE IF EXISTS "permisos";
 DROP SEQUENCE IF EXISTS "public".permisos_id_seq;
 CREATE SEQUENCE "public".permisos_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
@@ -66,7 +133,9 @@ WITH (oids = false);
 CREATE UNIQUE INDEX conductores_patente_key ON public.vehiculos USING btree (patente);
 
 INSERT INTO "vehiculos" ("id", "marca", "modelo", "patente", "estado", "color", "id_chofer") VALUES
-(3,	'chevrolet',	'spin',	'AA456FG',	'ocupado',	'rojo',	NULL);
+(3,	'CHEVROLET',	'spin',	'AA456FG',	'disponible',	'ROJO',	NULL),
+(5,	'CHEVROLET',	'SPIN',	'AA456FH',	'ocupado',	'GRIS PLATA',	1),
+(6,	'FIAT',	'CRONOS',	'AT484GF',	'ocupado',	'BLANCO',	4);
 
 DROP TABLE IF EXISTS "viajes";
 DROP SEQUENCE IF EXISTS "public".viajes_id_seq;
@@ -88,11 +157,13 @@ CREATE TABLE "public"."viajes" (
 WITH (oids = false);
 
 
+ALTER TABLE ONLY "public"."autorizantes" ADD CONSTRAINT "fk_autorizante_empresa" FOREIGN KEY (id_empresa) REFERENCES cuenta_empresa(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY "public"."permisos" ADD CONSTRAINT "permisos_id_user_fkey" FOREIGN KEY (id_user) REFERENCES usuarios(id);
 
-ALTER TABLE ONLY "public"."vehiculos" ADD CONSTRAINT "fk_vehiculo_chofer" FOREIGN KEY (id_chofer) REFERENCES usuarios(id);
+ALTER TABLE ONLY "public"."vehiculos" ADD CONSTRAINT "fk_vehiculo_chofer" FOREIGN KEY (id_chofer) REFERENCES choferes(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY "public"."viajes" ADD CONSTRAINT "viajes_conductor_id_fkey" FOREIGN KEY (conductor_id) REFERENCES vehiculos(id);
 ALTER TABLE ONLY "public"."viajes" ADD CONSTRAINT "viajes_pasajero_id_fkey" FOREIGN KEY (pasajero_id) REFERENCES usuarios(id);
 
--- 2026-04-06 19:55:40 UTC
+-- 2026-04-07 19:45:25 UTC

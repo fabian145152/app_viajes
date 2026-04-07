@@ -28,14 +28,13 @@ $nombre_completo = $row['nom_apellido'] ?? '';
     <h1>Inicio Superusuario</h1>
     <p>Bienvenido <?php echo $nombre_completo; ?></p>
 
-
-
-
     <ul>
         <li><a href="00_administracion/menu_admin.php">ADMINISTRACION</a></li>
-        <li><a href="">CUENTAS CORRIENTES</a></li>
-        <li><a href="">DESPACHO DE VIAJES</a></li>
-        <li><a href="">TRAFICO</a></li>
+        <li><a href="00_administracion/trafico/listado.php">TRAFICO</a></li>
+        <li><a href="00_administracion/choferes/listado_choferes.php">CHOFERES</a></li>
+        <li><a href="00_administracion/cuentas_empresas/listado_empresas.php">CUENTAS CORRIENTES EMPRESAS</a></li>
+        <li><a href="00_administracion/autorizantes/listado_autorizantes.php">AUTORIZANTES</a></li>
+        <li><a href="00_administracion/despacho_viajes/listado_despacho.php">DESPACHO DE VIAJES</a></li>
 
         <li></li>
         <li><a href="logout.php">SALIR</a></li>

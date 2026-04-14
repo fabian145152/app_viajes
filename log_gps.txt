@@ -1,0 +1,14 @@
+Estado: activo | Lat: -34.6472704 | Lng: -58.4580897 | Fecha: 2026-04-14 18:59:33
+Estado: activo | Lat: -34.6472704 | Lng: -58.4580897 | Fecha: 2026-04-14 18:59:35
+Estado: activo | Lat: -34.6472646 | Lng: -58.4580911 | Fecha: 2026-04-14 19:00:14
+Estado: activo | Lat: -34.6472613 | Lng: -58.458084 | Fecha: 2026-04-14 19:00:25
+Estado: activo | Lat: -34.6472534 | Lng: -58.4580944 | Fecha: 2026-04-14 19:04:01
+Estado: activo | Lat: -34.6472617 | Lng: -58.4580964 | Fecha: 2026-04-14 19:04:45
+Estado: activo | Lat: -34.647266 | Lng: -58.4580864 | Fecha: 2026-04-14 19:05:32
+Estado: activo | Lat: -34.6472697 | Lng: -58.4580765 | Fecha: 2026-04-14 20:06:49
+Estado: activo | Lat: -34.6472702 | Lng: -58.4580802 | Fecha: 2026-04-14 20:07:03
+Estado: activo | Lat: -34.6472645 | Lng: -58.4580804 | Fecha: 2026-04-14 20:07:47
+Estado: activo | Lat: -34.6472645 | Lng: -58.4580804 | Fecha: 2026-04-14 20:07:51
+Estado: activo | Lat: -34.6472444 | Lng: -58.4580835 | Fecha: 2026-04-14 20:07:57
+Estado: activo | Lat: -34.6472444 | Lng: -58.4580835 | Fecha: 2026-04-14 20:08:01
+Estado: activo | Lat: -34.6472507 | Lng: -58.4580906 | Fecha: 2026-04-14 20:08:07

@@ -37,6 +37,26 @@ $viajes = obtenerViajes();
     <link rel="stylesheet" href="../../../css/listado_viajes.css">
     <script src="../../../js/listado_viajes.js"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const select = document.getElementById("diferido");
+            const campos = document.getElementById("campos_diferido");
+
+            function toggleCampos() {
+                if (select.value === "Si") {
+                    campos.style.display = "block";
+                } else {
+                    campos.style.display = "none";
+                }
+            }
+
+            // Ejecutar al cargar (por si viene editando)
+            toggleCampos();
+
+            // Ejecutar al cambiar
+            select.addEventListener("change", toggleCampos);
+        });
+    </script>
 
 
     <script>
@@ -107,21 +127,53 @@ $viajes = obtenerViajes();
                     let m2 = L.marker([lat2, lon2]).addTo(map).bindPopup("Destino");
                     markers.push(m1, m2);
 
-                    fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`)
+                    let rutas = [];
+
+                    fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson&alternatives=true`)
                         .then(r => r.json())
                         .then(data => {
+
                             if (!data.routes.length) {
                                 alert("Sin ruta");
                                 return;
                             }
 
-                            line = L.geoJSON(data.routes[0].geometry, {
-                                style: {
-                                    color: 'blue',
-                                    weight: 5
-                                }
-                            }).addTo(map);
-                            map.fitBounds(line.getBounds());
+                            // limpiar rutas anteriores
+                            rutas.forEach(r => map.removeLayer(r));
+                            rutas = [];
+
+                            data.routes.forEach((route, index) => {
+
+                                let layer = L.geoJSON(route.geometry, {
+                                    style: {
+                                        color: index === 0 ? 'blue' : 'gray',
+                                        weight: index === 0 ? 6 : 4,
+                                        opacity: index === 0 ? 1 : 0.5
+                                    }
+                                }).addTo(map);
+
+                                // CLICK para seleccionar ruta
+                                layer.on('click', function() {
+
+                                    rutas.forEach(r => r.setStyle({
+                                        color: 'gray',
+                                        weight: 4,
+                                        opacity: 0.5
+                                    }));
+
+                                    this.setStyle({
+                                        color: 'red',
+                                        weight: 6,
+                                        opacity: 1
+                                    });
+
+                                    console.log("Ruta seleccionada:", route);
+                                });
+
+                                rutas.push(layer);
+                            });
+
+                            map.fitBounds(rutas[0].getBounds());
                         });
                 });
         }
@@ -156,12 +208,40 @@ $viajes = obtenerViajes();
 
                     <div class="form-group">
                         <label>Dirección Origen</label>
-                        <input type="text" name="direccion_origen" value="<?= htmlspecialchars($viaje['direccion_origen'] ?? '') ?>" required>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="dir_origen" name="direccion_origen"
+                                value="<?= htmlspecialchars($viaje['direccion_origen'] ?? '') ?>" required>
+
+                            <button type="button" class="btn-map btn-origen"
+                                onclick="verMapa(document.getElementById('dir_origen').value)">
+                                O
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Dirección Destino</label>
-                        <input type="text" name="direccion_destino" value="<?= htmlspecialchars($viaje['direccion_destino'] ?? '') ?>" required>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="dir_destino" name="direccion_destino"
+                                value="<?= htmlspecialchars($viaje['direccion_destino'] ?? '') ?>">
+
+                            <!-- Ver destino -->
+                            <button type="button" class="btn-map btn-destino"
+                                title="Ver destino"
+                                onclick="verMapa(document.getElementById('dir_destino').value)">
+                                D
+                            </button>
+
+                            <!-- Ver recorrido -->
+                            <button type="button" class="btn-map btn-recorrido"
+                                title="Ver recorrido"
+                                onclick="verRecorrido(
+                document.getElementById('dir_origen').value,
+                document.getElementById('dir_destino').value
+            )">
+                                R
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -174,6 +254,8 @@ $viajes = obtenerViajes();
                         <textarea name="obs_pasaj"><?= htmlspecialchars($viaje['obs_pasaj'] ?? '') ?></textarea>
                     </div>
 
+                    <!--
+
                     <div class="form-group">
                         <label>Tipo de Viaje</label>
                         <select name="diferido">
@@ -181,6 +263,28 @@ $viajes = obtenerViajes();
                             <option value="Si" <?= (isset($viaje['diferido']) && $viaje['diferido'] == "Si") ? 'selected' : ''; ?>>Diferido</option>
                         </select>
                     </div>
+-->
+                    <div class="form-group">
+                        <label>Tipo de Viaje</label>
+                        <select name="diferido" id="diferido">
+                            <option value="No" <?= (isset($viaje['diferido']) && $viaje['diferido'] == "No") ? 'selected' : ''; ?>>Inmediato</option>
+                            <option value="Si" <?= (isset($viaje['diferido']) && $viaje['diferido'] == "Si") ? 'selected' : ''; ?>>Diferido</option>
+                        </select>
+                    </div>
+
+                    <div id="campos_diferido" style="display: none;">
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" name="fecha" value="<?= $viaje['fecha'] ?? '' ?>">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Hora</label>
+                            <input type="time" name="hora" value="<?= $viaje['hora'] ?? '' ?>">
+                        </div>
+                    </div>
+
+
 
                     <div class="form-group">
                         <label>Categoría</label>
@@ -213,7 +317,8 @@ $viajes = obtenerViajes();
                             <th class="col-direccion">Destino</th>
                             <th class="col-cat">Categoría</th>
                             <th class="col-tipo">Tipo</th>
-                            <th class="col-mapa">Mapa</th>
+                            <th class="col-tipo">Fecha</th>
+                            <th class="col-tipo">Hora</th>
                             <th class="col-acciones">Acciones</th>
                         </tr>
                     </thead>
@@ -235,39 +340,20 @@ $viajes = obtenerViajes();
                                     </td>
 
                                     <td class="col-direccion">
-                                        <div class="dir-cell">
-                                            <span><?= htmlspecialchars($v['direccion_origen']) ?></span>
-                                            <button class="btn-map btn-origen"
-                                                title="Ver origen"
-                                                onclick='verMapa(<?= json_encode($v["direccion_origen"]); ?>)'>
-                                                O
-                                            </button>
-                                        </div>
+                                        <?= htmlspecialchars($v['direccion_origen']) ?>
                                     </td>
 
                                     <td class="col-direccion">
-                                        <div class="dir-cell">
-                                            <span><?= htmlspecialchars($v['direccion_destino']) ?></span>
-                                            <button class="btn-map btn-destino"
-                                                title="Ver destino"
-                                                onclick='verMapa(<?= json_encode($v["direccion_destino"]); ?>)'>
-                                                D
-                                            </button>
-                                        </div>
+                                        <?= htmlspecialchars($v['direccion_destino']) ?>
                                     </td>
 
                                     <td class="col-cat"><?= $v['categoria_movil'] ?></td>
                                     <td class="col-tipo"><?= $v['diferido'] ?></td>
 
-                                    <td class="col-mapa">
-                                        <button class="btn-map btn-recorrido"
-                                            title="Ver recorrido"
-                                            onclick='verRecorrido(
-        <?= json_encode($v["direccion_origen"]); ?>,
-        <?= json_encode($v["direccion_destino"]); ?>
-    )'>
-                                            R
-                                    </td>
+                                    <td class="col-tipo"><?= $v['fecha'] ?></td>
+                                    <td class="col-tipo"><?= $v['hora'] ?></td>
+
+
 
                                     <td class="col-acciones">
                                         <a href="?editar=<?= $v['id'] ?>">Editar</a>

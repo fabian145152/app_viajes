@@ -62,91 +62,92 @@
     transform: scale(1.05);
 }
 
-    .table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
 
-        .table th,
-        .table td {
-            padding: 8px;
-            border-bottom: 1px solid #ccc;
-        }
+.table th,
+.table td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
 
-        .col-id {
-            width: 60px;
-            text-align: center;
-        }
+.col-id {
+    width: 60px;
+    text-align: center;
+}
 
-        .col-pasajero {
-            width: 180px;
-        }
+.col-pasajero {
+    width: 180px;
+}
 
-        .col-direccion {
-            width: 220px;
-        }
+.col-direccion {
+    width: 220px;
+}
 
-        .col-cat {
-            width: 110px;
-            text-align: center;
-        }
+.col-cat {
+    width: 110px;
+    text-align: center;
+}
 
-        .col-tipo {
-            width: 110px;
-            text-align: center;
-        }
+.col-tipo {
+    width: 110px;
+    text-align: center;
+}
 
-        .col-mapa {
-            width: 90px;
-            text-align: center;
-        }
+.col-mapa {
+    width: 90px;
+    text-align: center;
+}
 
-        .col-acciones {
-            width: 150px;
-            text-align: center;
-        }
+.col-acciones {
+    width: 150px;
+    text-align: center;
+}
 
-        .dir-cell {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 6px;
-        }
+.dir-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+}
 
-        .dir-cell span {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+.dir-cell span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-        button {
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 16px;
-        }
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 16px;
+}
 
-        button:hover {
-            transform: scale(1.15);
-        }
+button:hover {
+    transform: scale(1.15);
+}
 
-        .form-group {
-            margin-bottom: 10px;
-        }
+.form-group {
+    margin-bottom: 10px;
+}
 
-        .form-group label {
-            display: block;
-            font-weight: bold;
-        }
+.form-group label {
+    display: block;
+    font-weight: bold;
+}
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 6px;
-        }
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 6px;
+}
 
-        .actions {
-            margin-top: 15px;
-        }
+.actions {
+    margin-top: 15px;
+}
+

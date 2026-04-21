@@ -594,7 +594,7 @@ function guardarViaje($datos)
         // ACTUALIZAR
         $sql = "UPDATE viajes_despacho SET 
                 cel_pasaj=?, nombre_pasaj=?, direccion_origen=?, direccion_destino=?, 
-                obs_operador=?, obs_pasaj=?, diferido=?, categoria_movil=? 
+                obs_operador=?, obs_pasaj=?, diferido=?, fecha=?, hora=?, categoria_movil=? 
                 WHERE id=?";
         $stmt = $db->prepare($sql);
         $stmt->execute([
@@ -605,14 +605,16 @@ function guardarViaje($datos)
             $datos['obs_operador'],
             $datos['obs_pasaj'],
             $datos['diferido'],
+            $datos['fecha'],
+            $datos['hora'],
             $datos['categoria_movil'],
             $datos['id']
         ]);
     } else {
         // INSERTAR NUEVO
         $sql = "INSERT INTO viajes_despacho 
-                (cel_pasaj, nombre_pasaj, direccion_origen, direccion_destino, obs_operador, obs_pasaj, diferido, categoria_movil) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                (cel_pasaj, nombre_pasaj, direccion_origen, direccion_destino, obs_operador, obs_pasaj, diferido, fecha, hora, categoria_movil) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $db->prepare($sql);
         $stmt->execute([
             $datos['cel_pasaj'],
@@ -622,6 +624,8 @@ function guardarViaje($datos)
             $datos['obs_operador'],
             $datos['obs_pasaj'],
             $datos['diferido'],
+            $datos['fecha'],
+            $datos['hora'],
             $datos['categoria_movil']
         ]);
     }

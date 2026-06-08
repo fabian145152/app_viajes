@@ -30,21 +30,29 @@ $nombre_completo = $row['nom_apellido'] ?? '';
     <p>Bienvenido <?php echo $nombre_completo; ?></p>
 
     <ul>
+        <li>Administracion</li>
         <li><a href="00_administracion/menu_admin.php">ADMINISTRACION</a></li>
-        <li><a href="00_administracion/trafico/listado.php">TRAFICO</a></li>
+        <br>
+        <li>Trafico</li>
+        <li><a href="00_administracion/trafico/listado.php">UNIDADES</a></li>
         <li><a href="00_administracion/choferes/listado_choferes.php">CHOFERES</a></li>
+        <br>
+        <li>Cuentas Corrientes</li>
         <li><a href="00_administracion/cuentas_empresas/listado_empresas.php">CUENTAS CORRIENTES EMPRESAS</a></li>
-        <li><a href="00_administracion/autorizantes/listado_autorizantes.php">AUTORIZANTES</a></li>
+        <br>
+        <li>Despacho de Viajes</li>
         <li><a href="00_administracion/despacho_viajes/carga_viajes.php" target="_blank">NUEVOS VIAJES</a></li>
         <li><a href="00_administracion/despacho_viajes/lista_viajes.php" target="_blank">LISTADO DE VIAJES</a></li>
-        <li></li>
-        <li></li>
-        <li><a href="01_mapeo/ver_mapa.html" target="_blank">MAPEO</a></li>
+        <br>
+        <li><a href="00_administracion/despacho_viajes/mapa_de_viajes.php" target="_blank">MAPA DE VIAJES</a></li>
+        <li><a href="01_mapeo/ver_mapa.php" target="_blank">MAPA DE UNIDADES TRABAJANDO</a></li>
+        <br>
+        <li>PROGRAMAS DE MUESTREO</li>
         <li><a href="01_mapeo/recibir.php" target="_blank">RECIBIR</a></li>
         <li><a href="01_mapeo/obtener_recorrido.php" target="_blank">RECORRIDO</a></li>
         <li></li>
         <li><a href="logout.php">SALIR</a></li>
-        
+
 
     </ul>
 </body>

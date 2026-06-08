@@ -215,6 +215,7 @@ async function calcularTarifa() {
 // ================= TARIFA VISIBILIDAD =================
 document.addEventListener("DOMContentLoaded", function () {
 
+
     const categoria = document.getElementById("categoria_movil");
     const bloque = document.getElementById("bloque_tarifa");
 
@@ -223,8 +224,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function toggleTarifa() {
         if (categoria.value === "TAXI") {
             bloque.style.display = "block";
+            
         } else {
             bloque.style.display = "none";
+            
         }
     }
 

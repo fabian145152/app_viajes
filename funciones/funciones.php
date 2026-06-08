@@ -215,7 +215,14 @@ function protegerPagina($rolesPermitidos = [])
 
     // 🔐 validar login
     if (!isset($_SESSION['logueado'])) {
-        die("No estás logueado");
+        //die("No estás logueado");
+?>
+
+        <script>
+            alert("No estás logueado");
+            window.location.href = "../../../index.html"; // 👈 CAMBIAR ACA
+        </script>
+<?php
     }
 
     // 🔐 validar permisos
@@ -405,7 +412,7 @@ function obtenerEmpresas()
 {
     $pdo = conexion();
 
-    $sql = "SELECT * FROM cuenta_empresa ORDER BY numero_cuenta ASC";
+    $sql = "SELECT * FROM cuenta_empresa ORDER BY id_empresa ASC";
     return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -424,66 +431,70 @@ function guardarEmpresa($data)
 {
     $pdo = conexion();
 
-    // Función auxiliar interna para limpiar strings vacíos a NULL real
     $limpiar = function ($valor) {
-        // Trim quita espacios accidentales, si queda vacío tras el trim, devolvemos null
-        return (isset($valor) && trim($valor) !== '') ? trim($valor) : null;
+        return (isset($valor) && trim($valor) !== '')
+            ? trim($valor)
+            : null;
     };
 
-    // Aplicamos la limpieza a los campos problemáticos
+    $numero_cuenta = $limpiar($data['numero_cuenta'] ?? null);
     $cuit          = $limpiar($data['cuit'] ?? null);
     $inc_brutos    = $limpiar($data['inc_brutos'] ?? null);
     $cel_1         = $limpiar($data['cel_1'] ?? null);
-    $cel_2         = $limpiar($data['cel_2'] ?? null);
-    $cel_3         = $limpiar($data['cel_3'] ?? null); // Agregado para consistencia
-    $numero_cuenta = $limpiar($data['numero_cuenta'] ?? null);
+    $contacto_1    = $limpiar($data['contacto_1'] ?? null);
+    $dir           = $limpiar($data['dir'] ?? null);
+    $razon_social  = $limpiar($data['razon_social'] ?? null);
 
     if (!empty($data['id'])) {
+
         // UPDATE
         $sql = "UPDATE cuenta_empresa SET
-                razon_social=?, dir=?, cuit=?, inc_brutos=?, 
-                cel_1=?, cel_2=?, cel_3=?,
-                contacto_1=?, contacto_2=?, contacto_3=?,
-                numero_cuenta=?
-                WHERE id=?";
+                    id_empresa = ?,
+                    razon_social = ?,
+                    dir = ?,
+                    cuit = ?,
+                    inc_brutos = ?,
+                    contacto_1 = ?,
+                    cel_1 = ?
+                WHERE id = ?";
+
         $stmt = $pdo->prepare($sql);
 
         return $stmt->execute([
-            $data['razon_social'],
-            $data['dir'],
+            $numero_cuenta,
+            $razon_social,
+            $dir,
             $cuit,
             $inc_brutos,
+            $contacto_1,
             $cel_1,
-            $cel_2,
-            $cel_3,
-            $data['contacto_1'],
-            $data['contacto_2'],
-            $data['contacto_3'],
-            $numero_cuenta,
             $data['id']
         ]);
     } else {
+
         // INSERT
         $sql = "INSERT INTO cuenta_empresa
-                (razon_social, dir, cuit, inc_brutos, 
-                 cel_1, cel_2, cel_3,
-                 contacto_1, contacto_2, contacto_3,
-                 numero_cuenta)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                (
+                    id_empresa,
+                    razon_social,
+                    dir,
+                    cuit,
+                    inc_brutos,
+                    contacto_1,
+                    cel_1
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+
         $stmt = $pdo->prepare($sql);
 
         return $stmt->execute([
-            $data['razon_social'],
-            $data['dir'],
+            $numero_cuenta,
+            $razon_social,
+            $dir,
             $cuit,
             $inc_brutos,
-            $cel_1,
-            $cel_2,
-            $cel_3,
-            $data['contacto_1'],
-            $data['contacto_2'],
-            $data['contacto_3'],
-            $numero_cuenta
+            $contacto_1,
+            $cel_1
         ]);
     }
 }
@@ -494,6 +505,21 @@ function borrarEmpresa($id)
 
     $stmt = $pdo->prepare("DELETE FROM cuenta_empresa WHERE id=?");
     return $stmt->execute([$id]);
+}
+
+function obtenerCentrosCosto($id_empresa)
+{
+    $con = conexion();
+
+    $sql = "SELECT *
+            FROM centro_costo
+            WHERE id_empresa = ?
+            ORDER BY centro_de_costo";
+
+    $stmt = $con->prepare($sql);
+    $stmt->execute([$id_empresa]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 
@@ -513,69 +539,57 @@ function obtenerAutorizantes()
     return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function obtenerAutorizantePorId($id)
-{
-    $pdo = conexion();
 
-    $sql = "SELECT * FROM autorizantes WHERE id = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id]);
-
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-function guardarAutorizante($data)
-{
-    $pdo = conexion();
-    $cel = !empty($data['cel']) ? $data['cel'] : null;
-
-    if (!empty($data['id'])) {
-        // UPDATE
-        $sql = "UPDATE autorizantes 
-                SET nombre=?, apellido=?, cel=?, email=?, id_empresa=? 
-                WHERE id=?";
-        $stmt = $pdo->prepare($sql);
-        return $stmt->execute([
-            $data['nombre'],
-            $data['apellido'],
-            $cel,
-            $data['email'],
-            $data['id_empresa'], // Aquí se guarda la empresa a la que pertenece
-            $data['id']
-        ]);
-    } else {
-        // INSERT
-        $sql = "INSERT INTO autorizantes 
-                (nombre, apellido, cel, email, id_empresa) 
-                VALUES (?, ?, ?, ?, ?)";
-        $stmt = $pdo->prepare($sql);
-        return $stmt->execute([
-            $data['nombre'],
-            $data['apellido'],
-            $cel,
-            $data['email'],
-            $data['id_empresa']
-        ]);
-    }
-}
-
-function borrarAutorizante($id)
-{
-    $pdo = conexion();
-
-    $stmt = $pdo->prepare("DELETE FROM autorizantes WHERE id=?");
-    return $stmt->execute([$id]);
-}
 
 
 
 // obtenerViajes: Trae todos los despachos
+/*
 function obtenerViajes()
 {
     global $db;
-    $sql = "SELECT * FROM viajes_despacho ORDER BY id DESC";
+
+    $sql = "SELECT * FROM viajes_despacho ORDER BY 
+    CASE WHEN diferido = 'No' THEN 0 ELSE 1 END,
+    CASE WHEN diferido = 'No' THEN id END ASC,
+    fecha ASC,
+    hora ASC";
+
     return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
+*/
+// obtenerVianes modificada
+
+function obtenerViajes()
+{
+    global $db;
+
+    $sql = "SELECT
+                vd.*,
+                ce.razon_social AS empresa
+            FROM viajes_despacho vd
+            LEFT JOIN cuenta_empresa ce
+                ON vd.cc = ce.numero_cuenta
+            ORDER BY
+                CASE WHEN vd.diferido = 'No' THEN 0 ELSE 1 END,
+                CASE WHEN vd.diferido = 'No' THEN vd.id END ASC,
+                vd.fecha ASC,
+                vd.hora ASC";
+
+    return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
+/*
+function obtenerEmpresas()
+{
+    global $db;
+
+    $sql = "SELECT numero_cuenta, razon_social
+            FROM cuenta_empresa
+            ORDER BY razon_social";
+
+    return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
+*/
 
 // obtenerViajePorId: Para cargar los datos al editar
 function obtenerViajePorId($id)
@@ -587,49 +601,150 @@ function obtenerViajePorId($id)
 }
 
 // guardarViaje: Inserta uno nuevo o actualiza uno existente
+
+function obtenerCoordenadas($direccion)
+{
+    if (empty($direccion)) {
+        return null;
+    }
+
+    $direccion .= ", Buenos Aires, Argentina";
+
+    $url = "https://nominatim.openstreetmap.org/search?format=json&q=" .
+        urlencode($direccion) . "&limit=1";
+
+    $opts = [
+        'http' => [
+            'header' => "User-Agent: AppViajes/1.0\r\n"
+        ]
+    ];
+
+    $json = @file_get_contents(
+        $url,
+        false,
+        stream_context_create($opts)
+    );
+
+    if (!$json) {
+        return null;
+    }
+
+    $resultado = json_decode($json, true);
+
+    if (empty($resultado)) {
+        return null;
+    }
+
+    return [
+        'lat' => $resultado[0]['lat'],
+        'lng' => $resultado[0]['lon']
+    ];
+}
+
+
+
 function guardarViaje($datos)
 {
     global $db;
+
+    // Obtener coordenadas automáticamente
+    $origen = obtenerCoordenadas($datos['direccion_origen']);
+    $destino = obtenerCoordenadas($datos['direccion_destino']);
+
+    $origen_lat = $origen['lat'] ?? null;
+    $origen_lng = $origen['lng'] ?? null;
+
+    $destino_lat = $destino['lat'] ?? null;
+    $destino_lng = $destino['lng'] ?? null;
+
+
     if (!empty($datos['id'])) {
+
         // ACTUALIZAR
-        $sql = "UPDATE viajes_despacho SET 
-                cel_pasaj=?, nombre_pasaj=?, direccion_origen=?, direccion_destino=?, 
-                obs_operador=?, obs_pasaj=?, diferido=?, fecha=?, hora=?, categoria_movil=? 
+        $sql = "UPDATE viajes_despacho SET
+                    cel_pasaj=?,
+                    nombre_pasaj=?,
+                    direccion_origen=?,
+                    direccion_destino=?,
+                    origen_lat=?,
+                    origen_lng=?,
+                    destino_lat=?,
+                    destino_lng=?,
+                    obs_operador=?,
+                    obs_pasaj=?,
+                    estado=?,                    
+                    fecha=?,
+                    hora=?,
+                    categoria_movil=?,
+                    cc=?
                 WHERE id=?";
+
         $stmt = $db->prepare($sql);
+
         $stmt->execute([
             $datos['cel_pasaj'],
             $datos['nombre_pasaj'],
             $datos['direccion_origen'],
             $datos['direccion_destino'],
+            $origen_lat,
+            $origen_lng,
+            $destino_lat,
+            $destino_lng,
             $datos['obs_operador'],
             $datos['obs_pasaj'],
-            $datos['diferido'],
+            $datos['estado'],
             $datos['fecha'],
             $datos['hora'],
             $datos['categoria_movil'],
-            $datos['id']
+            $datos['cc'],
+            $datos['id'] // 👈 ESTE FALTABA
         ]);
     } else {
+
         // INSERTAR NUEVO
-        $sql = "INSERT INTO viajes_despacho 
-                (cel_pasaj, nombre_pasaj, direccion_origen, direccion_destino, obs_operador, obs_pasaj, diferido, fecha, hora, categoria_movil) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO viajes_despacho
+                (   cel_pasaj,
+                    nombre_pasaj,
+                    direccion_origen,
+                    direccion_destino,
+                    origen_lat,
+                    origen_lng,
+                    destino_lat,
+                    destino_lng,
+                    obs_operador,
+                    obs_pasaj,
+                    estado,
+                    fecha,
+                    hora,
+                    categoria_movil,
+                    cc)
+                VALUES
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         $stmt = $db->prepare($sql);
+
         $stmt->execute([
             $datos['cel_pasaj'],
             $datos['nombre_pasaj'],
             $datos['direccion_origen'],
             $datos['direccion_destino'],
+            $origen_lat,
+            $origen_lng,
+            $destino_lat,
+            $destino_lng,
             $datos['obs_operador'],
             $datos['obs_pasaj'],
-            $datos['diferido'],
+            $datos['estado'],
             $datos['fecha'],
             $datos['hora'],
-            $datos['categoria_movil']
+            $datos['categoria_movil'],
+            $datos['cc']
+            //$datos['id'] // 👈 ESTE FALTABA
         ]);
     }
 }
+
+
 
 // borrarViaje: Elimina un registro
 function borrarViaje($id)
@@ -637,4 +752,188 @@ function borrarViaje($id)
     global $db;
     $stmt = $db->prepare("DELETE FROM viajes_despacho WHERE id = ?");
     $stmt->execute([$id]);
+}
+
+function obtenerCentrosCostoPorEmpresa($id_empresa)
+{
+    $pdo = conexion();
+
+    $sql = "SELECT cc.*,
+                   ce.razon_social
+            FROM centros_costo cc
+            INNER JOIN cuenta_empresa ce
+                ON cc.id_empresa = ce.id
+            WHERE cc.id_empresa = ?
+            ORDER BY cc.centro_de_costo";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id_empresa]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function obtenerCentroCostoPorId($id)
+{
+    $pdo = conexion();
+
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM centros_costo
+        WHERE id=?
+    ");
+
+    $stmt->execute([$id]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function guardarCentroCosto($data)
+{
+    $pdo = conexion();
+
+    if (!empty($data['id'])) {
+
+        // EDITAR
+        $sql = "UPDATE centros_costo SET
+                    nombre = ?,
+                    obs = ?
+                WHERE id = ?";
+
+        $stmt = $pdo->prepare($sql);
+
+        return $stmt->execute([
+            $data['nombre'],
+            $data['obs'],
+            $data['id']
+        ]);
+    } else {
+
+        // GENERAR PRÓXIMO CÓDIGO AUTOMÁTICO
+        $sql = "SELECT COALESCE(MAX(centro_de_costo),0)+1 AS nuevo
+                FROM centros_costo
+                WHERE id_empresa = ?";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$data['id_empresa']]);
+
+        $codigo = $stmt->fetch(PDO::FETCH_ASSOC)['nuevo'];
+
+        // INSERTAR
+        $sql = "INSERT INTO centros_costo
+                (
+                    id_empresa,
+                    centro_de_costo,
+                    nombre,
+                    obs
+                )
+                VALUES (?, ?, ?, ?)";
+
+        $stmt = $pdo->prepare($sql);
+
+        return $stmt->execute([
+            $data['id_empresa'],
+            $codigo,
+            $data['nombre'],
+            $data['obs']
+        ]);
+    }
+}
+
+function borrarCentroCosto($id)
+{
+    $pdo = conexion();
+
+    $stmt = $pdo->prepare("
+        DELETE FROM centros_costo
+        WHERE id=?
+    ");
+
+    return $stmt->execute([$id]);
+}
+
+function guardarAutorizante($data)
+{
+    $pdo = conexion();
+
+    if (!empty($data['id'])) {
+
+        $sql = "UPDATE autorizantes_cc SET
+                    nombre=?,
+                    celular=?,
+                    email=?,
+                    horario=?
+                WHERE id=?";
+
+        $stmt = $pdo->prepare($sql);
+
+        return $stmt->execute([
+            $data['nombre'],
+            $data['celular'],
+            $data['email'],
+            $data['horario'],
+            $data['id']
+        ]);
+    } else {
+
+        $sql = "INSERT INTO autorizantes_cc
+                (
+                    id_empresa,
+                    id_cc,
+                    nombre,
+                    celular,
+                    email,
+                    horario
+                )
+                VALUES (?, ?, ?, ?, ?, ?)";
+
+        $stmt = $pdo->prepare($sql);
+
+        return $stmt->execute([
+            $data['id_empresa'],
+            $data['id_cc'],
+            $data['nombre'],
+            $data['celular'],
+            $data['email'],
+            $data['horario']
+        ]);
+    }
+}
+
+function obtenerAutorizantesPorCC($id_cc)
+{
+    $pdo = conexion();
+
+    $sql = "SELECT *
+            FROM autorizantes_cc
+            WHERE id_cc=?
+            ORDER BY nombre";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id_cc]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function obtenerAutorizantePorId($id)
+{
+    $pdo = conexion();
+
+    $stmt = $pdo->prepare(
+        "SELECT * FROM autorizantes_cc WHERE id=?"
+    );
+
+    $stmt->execute([$id]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function borrarAutorizante($id)
+{
+    $pdo = conexion();
+
+    $stmt = $pdo->prepare(
+        "DELETE FROM autorizantes_cc WHERE id=?"
+    );
+
+    return $stmt->execute([$id]);
 }

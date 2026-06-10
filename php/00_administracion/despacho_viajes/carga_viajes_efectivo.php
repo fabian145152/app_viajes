@@ -44,9 +44,6 @@ $empresas = obtenerEmpresas();
             return cel;
         }
 
-
-
-
         document.addEventListener("DOMContentLoaded", function() {
 
             const diferido = document.getElementById("diferido");
@@ -121,19 +118,19 @@ $empresas = obtenerEmpresas();
     <div class="container">
         <div class="card">
 
-            <h3><?= $viaje ? "Editar Viaje" : "Nuevo Viaje de Cuenta corriente"; ?></h3>
+            <h3><?= $viaje ? "Editar Viaje" : "Nuevo Viaje Efectivo"; ?></h3>
 
             <div style="text-align:left; margin-bottom:15px;">
 
                 <a href="carga_viajes.php"
                     class="btn btn-primary"
                     style="margin-right:10px;">
-                    Viaje de Efectivo
+                    Viaje Cuenta Corriente
                 </a>
 
-                <a href="carga_viajes_efectivo.php"
+                <a href="carga_viajes.php"
                     class="btn btn-success">
-                    Viaje Efectivo
+                    Viaje de Cuenta Corriente
                 </a>
 
             </div>
@@ -143,41 +140,20 @@ $empresas = obtenerEmpresas();
                 <input type="hidden" name="id" value="<?= $viaje['id'] ?? '' ?>">
 
 
+
                 <!-- COLUMNA IZQUIERDA -->
                 <div class="col">
 
                     <div class="form-group">
-                        <label>Empresa</label>
-
-                        <select name="cc" id="cc" required>
-                            <option value="">-- Seleccione Empresa --</option>
-
-                            <?php foreach ($empresas as $empresa): ?>
-                                <option value="<?= $empresa['id_empresa'] ?>">
-                                    <?= $empresa['id_empresa'] ?> - <?= htmlspecialchars($empresa['razon_social']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Centro de Costo</label>
-
-                        <select name="id_cc" id="id_cc" required>
-                            <option value="">Seleccione una empresa primero</option>
-                        </select>
+                        <label>Nombre</label>
+                        <input type="text" name="nombre" value="" required>
                     </div>
 
 
                     <div class="form-group">
-                        <label>Autorizante</label>
-
-                        <select name="id_autorizante" id="id_autorizante">
-                            <option value="">Seleccione un centro de costo primero</option>
-                        </select>
+                        <label>Celular</label>
+                        <input type="text" name="celular" value="" required>
                     </div>
-
-
 
 
                     <div class="form-group">
@@ -191,6 +167,9 @@ $empresas = obtenerEmpresas();
                     </div>
 
                 </div>
+
+
+
 
                 <!-- COLUMNA DERECHA -->
                 <div class="col">

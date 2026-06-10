@@ -498,7 +498,7 @@ function guardarEmpresa($data)
         ]);
     }
 }
-
+/*
 function borrarEmpresa($id)
 {
     $pdo = conexion();
@@ -506,6 +506,57 @@ function borrarEmpresa($id)
     $stmt = $pdo->prepare("DELETE FROM cuenta_empresa WHERE id=?");
     return $stmt->execute([$id]);
 }
+*/
+
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+
+
+function borrarEmpresa($id)
+{
+    $pdo = conexion();
+
+    // Verificar autorizantes
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM autorizantes
+        WHERE id_empresa = ?
+    ");
+    $stmt->execute([$id]);
+
+    if ($stmt->fetchColumn() > 0) {
+        return "La empresa tiene autorizantes cargados. Debe eliminarlos antes de borrar la empresa.";
+    }
+
+    // Verificar centros de costo
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM centros_costo
+        WHERE id_empresa = ?
+    ");
+    $stmt->execute([$id]);
+
+    if ($stmt->fetchColumn() > 0) {
+        return "La empresa tiene centros de costo cargados. Debe eliminarlos antes de borrar la empresa.";
+    }
+
+    // Borrar empresa
+    $stmt = $pdo->prepare("
+        DELETE FROM cuenta_empresa
+        WHERE id = ?
+    ");
+
+    $stmt->execute([$id]);
+
+    return true;
+}
+
+
+
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+
+
 
 function obtenerCentrosCosto($id_empresa)
 {
@@ -796,7 +847,8 @@ function guardarCentroCosto($data)
         // EDITAR
         $sql = "UPDATE centros_costo SET
                     nombre = ?,
-                    obs = ?
+                    obs = ?,
+                    direccion = ?
                 WHERE id = ?";
 
         $stmt = $pdo->prepare($sql);
@@ -804,6 +856,7 @@ function guardarCentroCosto($data)
         return $stmt->execute([
             $data['nombre'],
             $data['obs'],
+            $data['direccion'],
             $data['id']
         ]);
     } else {
@@ -824,9 +877,10 @@ function guardarCentroCosto($data)
                     id_empresa,
                     centro_de_costo,
                     nombre,
-                    obs
+                    obs,
+                    direccion
                 )
-                VALUES (?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?)";
 
         $stmt = $pdo->prepare($sql);
 
@@ -834,7 +888,8 @@ function guardarCentroCosto($data)
             $data['id_empresa'],
             $codigo,
             $data['nombre'],
-            $data['obs']
+            $data['obs'],
+            $data['direccion']
         ]);
     }
 }
@@ -843,12 +898,27 @@ function borrarCentroCosto($id)
 {
     $pdo = conexion();
 
+    // Verificar autorizantes del centro de costo
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM autorizantes_cc
+        WHERE id_cc = ?
+    ");
+    $stmt->execute([$id]);
+
+    if ($stmt->fetchColumn() > 0) {
+        return "El centro de costo tiene autorizantes asociados. Debe eliminarlos antes de borrar el centro de costo.";
+    }
+
+    // Borrar centro de costo
     $stmt = $pdo->prepare("
         DELETE FROM centros_costo
-        WHERE id=?
+        WHERE id = ?
     ");
 
-    return $stmt->execute([$id]);
+    $stmt->execute([$id]);
+
+    return true;
 }
 
 function guardarAutorizante($data)

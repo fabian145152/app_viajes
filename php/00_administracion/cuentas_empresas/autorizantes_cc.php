@@ -49,7 +49,7 @@ $autorizantes = obtenerAutorizantesPorCC($id_cc);
     <div class="container">
 
         <h2>
-            Empresa: <?= htmlspecialchars($empresa['razon_social']) ?>
+            AUTORIZANTES DE LA EMPRESA: <?= htmlspecialchars($empresa['razon_social']) ?>
         </h2>
 
         <div class="card operadores-layout">

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 29-04-2026 a las 16:28:03
+-- Tiempo de generación: 10-06-2026 a las 21:24:05
 -- Versión del servidor: 10.4.14-MariaDB
 -- Versión de PHP: 7.2.33
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `app_viajes`
 --
+CREATE DATABASE IF NOT EXISTS `app_viajes` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `app_viajes`;
 
 -- --------------------------------------------------------
 
@@ -240,22 +242,39 @@ CREATE TABLE `autorizantes` (
   `apellido` varchar(30) NOT NULL,
   `cel` int(10) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `id_empresa` int(11) NOT NULL
+  `id_empresa` int(4) NOT NULL,
+  `id_centro_de_costo` int(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
 --
--- Volcado de datos para la tabla `autorizantes`
+-- Estructura de tabla para la tabla `autorizantes_cc`
 --
 
-INSERT INTO `autorizantes` (`id`, `nombre`, `apellido`, `cel`, `email`, `id_empresa`) VALUES
-(1, 'HORACIO', 'BARZANA', 1145892356, 'horacio@gmail.com', 3),
-(2, 'ARIEL', 'MENDIZABAL', 1132659865, 'ARIEL@GMAIL.COM', 2),
-(3, 'Adrian', 'Alonso', 1152639685, 'adrian@gmail.com', 3),
-(4, 'Alejandro', 'Perez', 1132659887, 'ale@gmail.com', 3),
-(5, 'Daniel', 'Muller', 1125639856, 'daniel@gmail.com', 2),
-(6, 'DAVID', 'FERNANDEZ', 1125896325, 'victor@gmail.com', 1),
-(7, 'FRANCISCO', 'GOMEZ', 1125896325, 'francisco@gmail.com', 5),
-(8, 'ROXANA', 'BARRIO', 1125896325, 'roxana@gmail.com', 5);
+CREATE TABLE `autorizantes_cc` (
+  `id` int(11) NOT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `id_cc` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `celular` varchar(30) DEFAULT NULL,
+  `email` varchar(50) NOT NULL,
+  `horario` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `centros_costo`
+--
+
+CREATE TABLE `centros_costo` (
+  `id` int(11) NOT NULL,
+  `id_empresa` int(4) NOT NULL,
+  `centro_de_costo` int(11) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `obs` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -292,29 +311,15 @@ INSERT INTO `choferes` (`id`, `nombre`, `apellido`, `cel`, `dir`, `barrio`, `cp`
 
 CREATE TABLE `cuenta_empresa` (
   `id` int(4) NOT NULL,
-  `numero_cuenta` int(4) NOT NULL,
+  `id_empresa` int(4) NOT NULL,
   `razon_social` varchar(50) NOT NULL,
   `dir` varchar(50) NOT NULL,
-  `cuit` int(20) NOT NULL,
-  `inc_brutos` int(20) NOT NULL,
-  `cel_1` int(10) NOT NULL,
-  `cel_2` int(10) DEFAULT NULL,
-  `cel_3` int(10) DEFAULT NULL,
+  `cuit` varchar(20) DEFAULT NULL,
+  `inc_brutos` varchar(20) DEFAULT NULL,
   `contacto_1` varchar(50) NOT NULL,
-  `contacto_2` varchar(50) DEFAULT NULL,
-  `contacto_3` varchar(50) DEFAULT NULL
+  `cel_1` int(10) NOT NULL,
+  `id_centro_de_costo` int(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `cuenta_empresa`
---
-
-INSERT INTO `cuenta_empresa` (`id`, `numero_cuenta`, `razon_social`, `dir`, `cuit`, `inc_brutos`, `cel_1`, `cel_2`, `cel_3`, `contacto_1`, `contacto_2`, `contacto_3`) VALUES
-(1, 1, 'AZ PLUS SRL', 'JUAN B JUSTO 7730', 30691714, 30691714, 1169356236, 0, 0, 'JUAN CARLOS PEREZ', '', ''),
-(2, 2, 'HTAL ITALIANO', 'CAMPICHUELO 2025', 2147483647, 2147483647, 1145781245, NULL, NULL, 'ALFREDO SOSA', '', ''),
-(3, 3, 'RINCON DE POSTA', 'CAMPICHUELO 2025', 2147483647, 2147483647, 1122223333, NULL, NULL, 'ALFREDO SOSA', '', ''),
-(4, 5, 'LA ARMONIA', 'PIERES 2020', 2147483647, 2147483647, 1125369856, NULL, NULL, 'JUAN FRAGA', '', ''),
-(5, 4, 'SEGUROS LA VIEJA', 'CAMARONES 2550', 2147483647, 2147483647, 1125896325, NULL, NULL, 'JORGE BARROS', '', '');
 
 -- --------------------------------------------------------
 
@@ -462,29 +467,35 @@ CREATE TABLE `viajes_despacho` (
   `origen_lat` decimal(10,8) DEFAULT NULL,
   `origen_lng` decimal(11,8) DEFAULT NULL,
   `destino_lat` decimal(10,8) DEFAULT NULL,
-  `destino_lng` decimal(11,8) DEFAULT NULL
+  `destino_lng` decimal(11,8) DEFAULT NULL,
+  `cc` int(4) DEFAULT NULL,
+  `centro_de_costo` int(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `viajes_despacho`
 --
 
-INSERT INTO `viajes_despacho` (`id`, `cel_pasaj`, `nombre_pasaj`, `direccion_origen`, `direccion_destino`, `obs_operador`, `obs_pasaj`, `estado`, `diferido`, `fecha`, `hora`, `categoria_movil`, `origen_lat`, `origen_lng`, `destino_lat`, `destino_lng`) VALUES
-(3, 1122226666, 'Paco Jerte', 'Camacua 2000', 'Vera 3020', '', 'Hola', '', 'Si', '2026-04-23', '14:00', 'TAXI', NULL, NULL, NULL, NULL),
-(4, 1169356236, 'Fabian Nogueroles', 'Carlos Gardel 3296, Villa Libertad', 'Sarmiento 250, San Martin', 'aaaa', 'bbbb', '', 'No', NULL, NULL, 'REMIS', NULL, NULL, NULL, NULL),
-(5, 1155556666, 'Facundo PAreja', 'French 2500', 'Beruti 2600', '', '', '', 'Si', '2026-04-28', '15:01', 'REMIS', NULL, NULL, NULL, NULL),
-(6, 1122226666, 'Pascualito Peres', 'Laprida 4490, Villa Martelli', 'French 2500, Vicente Lopez', '', '', '', 'No', NULL, NULL, 'REMIS', NULL, NULL, NULL, NULL),
-(7, 1123895689, 'Juan Carlos Giles', 'Lafuente 1499, CABA', 'Sanabria 1900, CABA', '', '', '', 'Si', '2026-04-28', '15:02', 'TAXI', NULL, NULL, NULL, NULL),
-(8, 1145675777, 'Yelitza', 'Av Lafuente 1499,caba', 'Sanabria 1979, CABA', '', '', '', 'Si', '2026-04-22', '16:05', 'REMIS', NULL, NULL, NULL, NULL),
-(9, 324, 'werf', 'Lafuente 1499, CABA', 'Sarmiento 250, San Martin', 'sdf', 'sdf', '', 'No', '0000-00-00', '', 'REMIS', NULL, NULL, NULL, NULL),
-(10, 1145895623, 'Carlos Garcia', 'Av Lafuente 1499,caba', 'Sanabria 1979', 'Hola Como andas', 'Flaco palido', '', 'No', '0000-00-00', '', 'TAXI', NULL, NULL, NULL, NULL),
-(11, 2147483647, 'Claudo Montes', 'Av Lafuente 1499,caba', '', 'De nuevo', 'Prueba texto', '', 'No', '0000-00-00', '', 'REMIS', NULL, NULL, NULL, NULL),
-(12, 1156892356, 'Fabian Vena', 'Sanabria 1979, caba', '', 'Operador', 'pasajero', '', 'No', '0000-00-00', '', 'REMIS', NULL, NULL, NULL, NULL),
-(13, 1145784215, 'Jose Manuel', 'jaun B justo 8661, caba', 'San Pedrito 2200, caba', 'Valor fijo $18.000-', '', '', 'No', '0000-00-00', '', 'REMIS', NULL, NULL, NULL, NULL),
-(14, 1125896589, 'Andres Castro Casado', '9 de julio 2500, Caba', 'Rivadavia 250, Caba', 'Viaja solo', '', '', 'No', '0000-00-00', '', '', NULL, NULL, NULL, NULL),
-(15, 2147483647, 'Franco Salas', 'Campichuelo 250, caba', 'laprida 4490, Villa martelli', 'Nada', '', '', 'Si', '2026-04-23', '16:01', '', NULL, NULL, NULL, NULL),
-(16, 1125896325, 'Julieta Fuentes', 'Gorriti 250,', 'Bondplandt 2503, caba', '', '', '', 'Si', '2026-04-07', '16:02', '', NULL, NULL, NULL, NULL),
-(17, 1125896587, 'Carlos Piaggio', 'irigoyen 1560', 'Lafuente 2500, caba', 'VF 8500-', '', '', 'No', '0000-00-00', '', '', NULL, NULL, NULL, NULL);
+INSERT INTO `viajes_despacho` (`id`, `cel_pasaj`, `nombre_pasaj`, `direccion_origen`, `direccion_destino`, `obs_operador`, `obs_pasaj`, `estado`, `diferido`, `fecha`, `hora`, `categoria_movil`, `origen_lat`, `origen_lng`, `destino_lat`, `destino_lng`, `cc`, `centro_de_costo`) VALUES
+(3, 1122226666, 'Paco Jerte', 'Camacua 2000', 'Vera 3020', '', 'Hola', 'Pendiente', 'Si', '2026-06-02', '11:10', 'TAXI', '-34.65731700', '-58.57914300', '-38.66710030', '-62.26609340', 1, 0),
+(4, 1169356236, 'Fabian Nogueroles', 'Camacua 2000, caba', 'French 2500, Vicente lopez', 'aaaa', 'bbbb', 'Pendiente', 'Si', '2026-06-02', '22:00', 'REMIS', '-34.62931130', '-58.45795720', '-34.55473440', '-58.51283720', 3, 0),
+(5, 1155556666, 'Facundo PAreja', 'French 2500', 'Beruti 2600', '', '', 'Pendiente', '', '2026-04-28', '15:01', 'REMIS', '-34.59035210', '-58.40024590', '-34.59218930', '-58.40268980', NULL, 0),
+(6, 1122226666, 'Pascualito Peres', 'Belaustegui 3200, caba', '', '', '', 'Diferido', 'Si', '2026-06-01', '12:30', 'VAN', '-34.61847300', '-58.48105300', NULL, NULL, 0, 0),
+(7, 1123895689, 'Juan Carlos Giles', 'Lafuente 1499, CABA', 'Sanabria 1900, CABA', '', '', 'Diferido', 'Si', '2026-04-28', '15:02', 'TAXI', '-34.64737290', '-58.45786790', '-34.61897950', '-58.49934130', 0, 0),
+(9, 1145896589, 'Gertrudis Lopez', 'Aranguren 450, caba', 'Garcia del rio 1250, caba', 'mirar bien', 'todo', 'Pendiente', 'No', '0000-00-00', '', 'REMIS', '-34.61241300', '-58.43735780', '-34.55175860', '-58.47860080', NULL, 0),
+(10, 1145895623, 'Carlos Garcia', 'Av Lafuente 1499,caba', 'Sanabria 1979', 'Hola Como andas', 'Flaco palido', 'Asignado', 'No', '0000-00-00', '', 'TAXI', '-34.64737290', '-58.45786790', '-34.61847620', '-58.50530700', NULL, 0),
+(11, 2147483647, 'Claudo Montes', 'Av Directorio 1499,caba', '', 'De nuevo', 'Prueba texto', 'En Curso', 'No', '0000-00-00', '', 'REMIS', '-34.63001600', '-58.44815960', NULL, NULL, NULL, 0),
+(12, 1156892356, 'Fabian Vena', 'Jonte 1979, caba', '', 'Operador', 'pasajero', 'Diferido', 'No', '0000-00-00', '', 'REMIS', '-34.60356530', '-58.47142840', NULL, NULL, NULL, 0),
+(13, 1145784215, 'Jose Manuel', 'Juan B justo 8661, caba', '', 'Valor fijo $18.000-', '', 'Diferido', 'Si', '2026-06-01', '21:00', 'REMIS', '-34.60332710', '-58.45666290', NULL, NULL, 0, 0),
+(14, 1125896589, 'Andres Castro Casado', 'Venezuela 1258, caba', 'Alvarez Jonre 1925, caba', 'Viaja solo', '', 'Completado', 'No', '0000-00-00', '', 'TAXI', '-34.61520970', '-58.40473700', NULL, NULL, NULL, 0),
+(15, 2147483647, 'Franco Salas', 'Martinez Castro 2200, caba', '', 'Nada', '', 'En Curso', 'Si', '2026-04-23', '16:01', 'REMIS', '-34.63803450', '-58.47959650', NULL, NULL, 0, 0),
+(16, 1125896325, 'Julieta Fuentes', 'Av Lafuente 120,caba', 'Beruti 2600, caba', '', '', 'Pendiente', 'Si', '2026-04-14', '22:00', 'REMIS', '-34.65672730', '-58.44623380', '-34.59218930', '-58.40268980', 0, 0),
+(17, 1125896587, 'Carlos Piaggio', 'Pichincha 1936', '', 'VF 8500-', '', 'Cancelado', 'No', '0000-00-00', '', 'TAXI', '-34.70673700', '-58.37486600', NULL, NULL, NULL, 0),
+(18, 1144445555, 'Alberto Garcia', 'Laprida 4490, Villa Martelli', 'Av Maipu 2200, Olivos', '', '', 'Pendiente', '', '2026-06-01', '10:50', 'REMIS', '-34.55154940', '-58.51190860', '-34.51614900', '-58.48816900', NULL, 0),
+(21, 1125896547, 'Laura Garcia', 'San Nicolas 4560, caba', 'Av Juan Bautista Alberdi 3601, caba', 'Hola', 'Relinda', 'Pendiente', 'No', '2026-06-01', '14:19', 'REMIS', '-34.59401180', '-58.51181370', '-34.63601680', '-58.47657290', NULL, 0),
+(22, 2147483647, 'Juan PErez', 'Miranda 258, caba', 'cuba 2585, caba', '', '', 'Pendiente', '', '2026-06-01', '21:09', 'VAN', '-34.63256040', '-58.51659780', '-34.55637170', '-58.45856500', NULL, 0),
+(23, 1125896589, 'Ernest Heminwuey', 'Bolivia 950, villa martelli', 'laprida 4490, Villa martelli', 'Pelotudo', 'de mierda', 'inmediato', '', '2026-06-02', '11:11', 'REMIS', '-34.54661640', '-58.50690670', '-34.55154940', '-58.51190860', 2, 0),
+(24, 1122334455, 'Pirulo achaval', 'Venezuela 4488, Villa martelli', 'Paraguay 350, villa martelli', '', '', 'En Curso', '', '2026-06-02', '15:19', 'TAXI', '-34.55236970', '-58.51121980', '-34.54868350', '-58.50704990', 0, 0);
 
 --
 -- Índices para tablas volcadas
@@ -500,6 +511,18 @@ ALTER TABLE `00_ubicaciones`
 -- Indices de la tabla `autorizantes`
 --
 ALTER TABLE `autorizantes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `autorizantes_cc`
+--
+ALTER TABLE `autorizantes_cc`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `centros_costo`
+--
+ALTER TABLE `centros_costo`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -553,7 +576,19 @@ ALTER TABLE `00_ubicaciones`
 -- AUTO_INCREMENT de la tabla `autorizantes`
 --
 ALTER TABLE `autorizantes`
-  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `autorizantes_cc`
+--
+ALTER TABLE `autorizantes_cc`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT de la tabla `centros_costo`
+--
+ALTER TABLE `centros_costo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `choferes`
@@ -565,7 +600,7 @@ ALTER TABLE `choferes`
 -- AUTO_INCREMENT de la tabla `cuenta_empresa`
 --
 ALTER TABLE `cuenta_empresa`
-  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `ubicaciones`
@@ -589,7 +624,7 @@ ALTER TABLE `vehiculos`
 -- AUTO_INCREMENT de la tabla `viajes_despacho`
 --
 ALTER TABLE `viajes_despacho`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Restricciones para tablas volcadas

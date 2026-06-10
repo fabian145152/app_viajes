@@ -19,11 +19,20 @@ if (isset($_POST['guardar'])) {
     exit;
 }
 
-if (isset($_GET['borrar'])) {
-    borrarCentroCosto($_GET['borrar']);
+$mensajeError = '';
 
-    header("Location: centro_de_costos.php?id_empresa=" . $id_empresa);
-    exit;
+if (isset($_GET['borrar'])) {
+
+    $resultado = borrarCentroCosto($_GET['borrar']);
+
+    if ($resultado === true) {
+
+        header("Location: centro_de_costos.php?id_empresa=" . $id_empresa);
+        exit;
+    } else {
+
+        $mensajeError = $resultado;
+    }
 }
 
 $editar = null;
@@ -47,9 +56,13 @@ $centros = obtenerCentrosCostoPorEmpresa($id_empresa);
 <body>
 
     <div class="container">
-
+        <?php if (!empty($mensajeError)): ?>
+            <script>
+                alert("<?= addslashes($mensajeError) ?>");
+            </script>
+        <?php endif; ?>
         <h2>
-            Empresa:
+            CENTRO DE COSTOS DE LA EMPRESA:
             <?= $empresa['razon_social'] ?>
         </h2>
 
@@ -76,9 +89,17 @@ $centros = obtenerCentrosCostoPorEmpresa($id_empresa);
                         required
                         value="<?= $editar['nombre'] ?? '' ?>">
 
+                    <input
+                        type="text"
+                        name="direccion"
+                        placeholder="Dirección"
+                        value="<?= $editar['direccion'] ?? '' ?>">
+
                     <textarea
                         name="obs"
                         placeholder="Observaciones"><?= $editar['obs'] ?? '' ?></textarea>
+
+
 
                     <button
                         type="submit"
@@ -102,10 +123,10 @@ $centros = obtenerCentrosCostoPorEmpresa($id_empresa);
 
                     <thead>
                         <tr>
-                            <th>ID</th>
+
                             <th>Empresa</th>
-                            <th>Código</th>
                             <th>Nombre</th>
+                            <th>Dirección</th>
                             <th>Observaciones</th>
                             <th>Acciones</th>
                             <th>Autorizantes</th>
@@ -117,16 +138,16 @@ $centros = obtenerCentrosCostoPorEmpresa($id_empresa);
                         <?php foreach ($centros as $c): ?>
 
                             <tr>
-
-                                <td><?= $c['id'] ?></td>
+                                <? $c['id'] ?>
 
                                 <td><?= htmlspecialchars($c['razon_social']) ?></td>
 
-                                <td><?= $c['centro_de_costo'] ?></td>
+                                <? $c['centro_de_costo'] ?>
                                 <td><?= htmlspecialchars($c['nombre']) ?></td>
 
                                 <!--                            <td><?= $c['centro_de_costo'] ?></td> -->
 
+                                <td><?= $c['direccion'] ?></td>
                                 <td><?= $c['obs'] ?></td>
 
                                 <td>

@@ -11,11 +11,21 @@ if (isset($_POST['guardar'])) {
 }
 
 // BORRAR
+$mensajeError = '';
+
 if (isset($_GET['borrar'])) {
-    borrarEmpresa($_GET['borrar']);
-    header("Location: listado_empresas.php");
-    exit;
+
+    $resultado = borrarEmpresa($_GET['borrar']);
+
+    if ($resultado === true) {
+        header("Location: centro_de_costos.php?id_empresa=" . $_GET['borrar']);
+        exit;
+    } else {
+        $mensajeError = $resultado;
+    }
 }
+
+
 
 // EDITAR
 $empresa = null;
@@ -39,8 +49,14 @@ $empresas = obtenerEmpresas();
 <body>
     <div class="container">
 
+        <?php if (!empty($mensajeError)): ?>
+            <script>
+                alert("<?= addslashes($mensajeError) ?>");
+            </script>
+        <?php endif; ?>
+
         <h2 class="text-center">
-            Gestión de Cuentas Corrientes de Empresas
+            CUENTAS CORRIENTES DE EMPRESAS
         </h2>
 
         <div class="card operadores-layout">

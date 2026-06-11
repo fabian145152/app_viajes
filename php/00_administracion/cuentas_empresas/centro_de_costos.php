@@ -61,7 +61,7 @@ $centros = obtenerCentrosCostoPorEmpresa($id_empresa);
                 alert("<?= addslashes($mensajeError) ?>");
             </script>
         <?php endif; ?>
-        <h2>
+        <h2>CUENTA N° <?= $empresa['id_empresa'] ?> -
             CENTRO DE COSTOS DE LA EMPRESA:
             <?= $empresa['razon_social'] ?>
         </h2>

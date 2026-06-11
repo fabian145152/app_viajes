@@ -1,5 +1,7 @@
 <?php
-include_once "../../../funciones/funciones.php";
+include_once "../../funciones/funciones.php";
+
+
 protegerPagina([0, 3]);
 
 $con = conexion();
@@ -24,6 +26,8 @@ $sql = "SELECT
 $stmt = $con->query($sql);
 $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -130,21 +134,25 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
+
     <div id="leyenda">
         <div class="item-leyenda">
             <span class="color color-taxi"></span>
-            Taxi Inmediato
+            Viaje taxi Inmediato
         </div>
 
         <div class="item-leyenda">
             <span class="color color-remis"></span>
-            Remis Inmediato
+            Viaje remis Inmediato
         </div>
 
         <div class="item-leyenda">
             <span class="color color-diferido"></span>
             Diferido
         </div>
+        <a href="../inicio_0.php" style="margin-left: 20px; font-size: 12px; text-decoration: none; color: #007bff;">
+            Volver al Menú
+        </a>
     </div>
 
     <div id="map"></div>

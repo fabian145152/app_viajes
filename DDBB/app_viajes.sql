@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-06-2026 a las 21:24:05
+-- Tiempo de generación: 11-06-2026 a las 21:49:42
 -- Versión del servidor: 10.4.14-MariaDB
 -- Versión de PHP: 7.2.33
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `app_viajes`
 --
-CREATE DATABASE IF NOT EXISTS `app_viajes` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `app_viajes`;
 
 -- --------------------------------------------------------
 
@@ -233,22 +231,6 @@ INSERT INTO `00_ubicaciones` (`id`, `lat`, `lng`, `status`, `usuario_id`, `fecha
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `autorizantes`
---
-
-CREATE TABLE `autorizantes` (
-  `id` int(4) NOT NULL,
-  `nombre` varchar(30) NOT NULL,
-  `apellido` varchar(30) NOT NULL,
-  `cel` int(10) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `id_empresa` int(4) NOT NULL,
-  `id_centro_de_costo` int(4) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `autorizantes_cc`
 --
 
@@ -262,6 +244,90 @@ CREATE TABLE `autorizantes_cc` (
   `horario` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `autorizantes_cc`
+--
+
+INSERT INTO `autorizantes_cc` (`id`, `id_empresa`, `id_cc`, `nombre`, `celular`, `email`, `horario`) VALUES
+(11, 12, 24, 'Alegre Maria Florencia', '', 'aleflor@gmail.com', ''),
+(13, 12, 24, 'Giles Juan Manuel', '', 'alegilesj@gmail.com', ''),
+(14, 12, 24, 'Giles Pablo andres', '', 'alegi@gmail.com', ''),
+(15, 12, 24, 'Perussetti Zully Elisa', '', 'aleperu@gmail.com', ''),
+(16, 13, 26, 'CARNAU MAZZEI SABRINA', '', 'HHH@PORTENIO.COM', ''),
+(17, 13, 26, 'ESTEVEZ EMILIANO', '', 'C@PORTENIO.COM', ''),
+(18, 13, 26, 'MASTRANGELO PABLO', '', 'B@PORTENIO.COM', ''),
+(19, 13, 26, 'MAZZINI	ALEJANDRA', '', 'mazini@PORTENIO.COM', ''),
+(20, 13, 26, 'PEREDO	ROMAN', '', 'RO@PORTENIO.COM', ''),
+(21, 13, 26, 'VAZQUEZ PABLO', '', 'FF@PORTENIO.COM', ''),
+(22, 13, 26, 'YAÑEZ SANTIAGO', '', 'GG@PORTENIO.COM', ''),
+(23, 14, 27, 'KUKIOLKA TAMARA', '', 'TAMARAKUKIOLKA@GMAIL.COM', ''),
+(24, 14, 27, 'MOHADEB SALOMON', '', 'SALOMONMOHADEB@GMAIL.COM', ''),
+(25, 14, 28, 'ALFIE VIVIANA ', '', 'VIVIANAALFIE@GMAIL.COM', ''),
+(26, 14, 28, 'FINGERET NURIA', '', 'NURIAFINGERET@GMAIL.COM', ''),
+(27, 14, 28, 'MOSER MARINA', '', 'MARINAMOSER@GMAIL.COM', ''),
+(28, 14, 28, 'POMPAS KAREN', '', 'KARENPOMPAS@GMAIL.COM', ''),
+(29, 14, 29, 'AJZENMESSER FERNANDO', '', 'FERNANDOAJZENMESSER@GMAIL.COM', ''),
+(30, 14, 29, 'LIBERMAN MARIO', '', 'ertoamarcogliese@PORTENIO.COM', ''),
+(31, 14, 30, 'ALGACE NADIA', '', 'NADIAALGACE@GMAIL.COM', ''),
+(32, 14, 30, 'GROSMAN YANINA', '', 'VVV@PORTENIO.COM', ''),
+(33, 14, 51, 'GALAGOVSKY TAMARA', '', 'GALAGOVSKY@PORTENIO.COM', ''),
+(34, 14, 51, 'GOLDFINGER VERONICA', '', 'r@PORTENIO.COM', ''),
+(35, 14, 32, 'FREUE MIRIAN', '', 'mfreue@amia.org.ar	', ''),
+(36, 14, 33, 'BARANKIEWICZ IGNACIO', '', 'GTERWE|@PORTENIO.COM', ''),
+(37, 14, 33, 'CAPLAN PABLO', '', 'pcaplan@amia.org.ar', ''),
+(38, 14, 33, 'JAGODA MARCELO', '', 'mjagoda@amia.org.ar', ''),
+(39, 14, 33, 'LUKACHER MARTIN', '', 'LUKACHER@PORTENIO.COM', ''),
+(40, 14, 33, 'MILINKIEWICZ HERNAN', '', 'DQA@PORTENIO.COM', ''),
+(41, 14, 34, 'PIESKE MARCELA ', '', 'MARCELAPIESKE@GMAIL.COM', ''),
+(42, 14, 34, 'SAMSOLO VANESA', '', 'BHGG@PORTENIO.COM', ''),
+(43, 14, 34, 'SCHERMAN GABRIEL', '', 'DDDDDDD@PORTENIO.COM', ''),
+(44, 14, 34, 'STARK MATIAS', '', '	STARKAMATIAS@GMAIL.COM', ''),
+(45, 14, 36, 'POMERANTZ DANIEL', '', 'POMERANTZ@PORTENIO.COM', ''),
+(46, 14, 36, 'RONIT BOREN', '', 'RONIT@PORTENIO.COM', ''),
+(47, 14, 37, 'KAPSZUK ELIO', '', 'ELIOKAPSZUK@GMAIL.COM', ''),
+(48, 14, 37, 'SCHRAIER NADIA', '', 'SCHRAIER@PORTENIO.COM', ''),
+(49, 14, 38, 'COSTANTINI DAMIAN', '', 'CONS@GMAIL.COM', ''),
+(50, 14, 38, 'FARIAS RAQUEL', '', 'FAR@GMAIL.COM', ''),
+(51, 14, 38, 'FELCMAN ADRIAN', '', 'FEL@GMAIL.COM', ''),
+(52, 14, 38, 'KUPFERMAN MARCELO', '', 'KUPFERMAN@GMAIL.COM', ''),
+(53, 14, 38, 'MOYA FLAVIO', '', 'MOY@GMAIL.COM', ''),
+(54, 14, 38, 'PARED RAMON', '', 'PAR@GMAIL.COM', ''),
+(55, 14, 40, 'ZALCMAN FLAVIA', '', 'ZALCMAN@PORTENIO.COM', ''),
+(56, 14, 41, 'CROUDO KARINA', '', 'CROUDO@PORTENIO.COM', ''),
+(57, 14, 41, 'EPELBAUM ELIANA', '', 'EPELBAUM@PORTENIO.COM', ''),
+(58, 14, 41, 'FRIDMAN SEBASTIAN', '', 'FRIDMANS@PORTENIO.COM', ''),
+(59, 14, 41, 'JAIT PAULA', '', 'JAIT@PORTENIO.COM', ''),
+(60, 14, 41, 'KOHON FANNY', '', 'FANNYKOHON@GMAIL.COM', ''),
+(61, 14, 41, 'LOKAJ DAMIAN', '', 'DAMIANLOKAJ@GMAIL.COM', ''),
+(62, 14, 41, 'MIZRAHI XIMENA', '', 'MIZRAHI@PORTENIO.COM', ''),
+(63, 14, 41, 'NAHUM AYLEN', '', 'NAHUM@PORTENIO.COM', ''),
+(64, 14, 41, 'RACHILEVICH JULIETA', '', 'RACHILEVICH@PORTENIO.COM', ''),
+(65, 14, 41, 'SCHUSTER BARBARA', '', 'shuster@PORTENIO.COM', ''),
+(66, 14, 41, 'TABOADA CONSTANZA', '', 'CONSTANZATABOADA@GMAIL.COM', ''),
+(67, 14, 41, 'VENTURA JULI', '', 'VENTURA@PORTENIO.COM', ''),
+(68, 14, 42, 'AIJENBOM VALERIA', '', 'AIJEM@GMAIL.COM', ''),
+(69, 14, 43, 'LLERNOVOY KARINA', '', 'LLERNOVOYK@PORTENIO.COM', ''),
+(70, 14, 43, 'Emanuel Cynthia Florencia', '', 'EMA@GMAIL.COM', ''),
+(71, 14, 43, 'Hamra Elías Eliahu Isaac', '', 'hamra@gmail.com', ''),
+(72, 14, 43, 'LANIADO ANDREA', '', 'LAN@GMAIL.COM', ''),
+(73, 14, 45, 'GLIKIN CLAUDIO', '', 'GLIKIN@PORTENIO.COM', ''),
+(74, 14, 46, 'ALBAJARI VERONICA', '', '	alaba@PORTENIO.COM', ''),
+(75, 14, 47, 'AUDAY SALVADOR', '', 'SALVADORAUDAY@GMAIL.COM', ''),
+(76, 14, 47, 'GRUBER JACKELINE', '', 'SSSSS@PORTENIO.COM', ''),
+(77, 14, 47, 'HEISEL MARIANA', '', 'DN@PORTENIO.COM', ''),
+(78, 14, 48, 'CAHANSKY SERGIO', '', 'caja@PORTENIO.COM', ''),
+(79, 14, 48, 'CHIPRUT ANDREA', '', 'CHIPRUT@PORTENIO.COM', ''),
+(80, 14, 48, 'JUNOVICH SANDRA', '', 'JUNOVICH@PORTENIO.COM', ''),
+(81, 14, 48, 'SALEM MARIANA ', '', 'SALEM@PORTENIO.COM', ''),
+(82, 14, 49, 'COHEN IMACH ARIEL', '', 'COHEN@PORTENIO.COM', ''),
+(83, 14, 49, 'GORENSTEN KARINA', '', 'GOREN@GMAIL.COM', ''),
+(84, 14, 49, 'KOROB KARINA', '', 'KOROB@PORTENIO.COM', ''),
+(85, 14, 49, 'LEWIN SANDRA', '', 'LEWIN@PORTENIO.COM', ''),
+(86, 14, 49, 'PALEY KARINA', '', 'PALEY@PORTENIO.COM', ''),
+(87, 14, 49, 'PALUCH LILI-VAAD', '', 'PALUCH@GMAIL.COM', ''),
+(88, 14, 50, 'COHEN MARCOS', '', '	COHENNAR@GMAIL.COM', ''),
+(89, 14, 50, 'JATEMLIANSKY TAMARA', '', '	cogliese@PORTENIO.COM', '');
+
 -- --------------------------------------------------------
 
 --
@@ -273,8 +339,42 @@ CREATE TABLE `centros_costo` (
   `id_empresa` int(4) NOT NULL,
   `centro_de_costo` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
-  `obs` varchar(255) DEFAULT NULL
+  `obs` varchar(255) DEFAULT NULL,
+  `direccion` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `centros_costo`
+--
+
+INSERT INTO `centros_costo` (`id`, `id_empresa`, `centro_de_costo`, `nombre`, `obs`, `direccion`) VALUES
+(24, 12, 1, 'ALEGRE EN FLOR', '', 'CAMACUA 250'),
+(26, 13, 1, 'ALGEIBA S.A.', '', 'PARANA 771 1Âº B'),
+(27, 14, 1, 'ADMINISTARCION SISTEMAS', '', 'Pasteur 633'),
+(28, 14, 2, 'ADMINISTRACION CONTADURIA', '', 'Pasteur 633'),
+(29, 14, 3, 'ADMINISTRACION DOCUMENTOS', '', 'Pasteur 633'),
+(30, 14, 4, 'ADMINISTRACION INMUEBLES', '', 'Pasteur 633'),
+(31, 14, 5, 'ADMINISTRACION INMUEBLES', '', 'Pasteur 633'),
+(32, 14, 6, 'ADMINNISTRACION COMPRAS', '', 'Pasteur 633'),
+(33, 14, 7, 'COCHERIA', '', 'PASTEUR 735'),
+(34, 14, 8, 'COMUNICACIONES', '', 'PASTEUR 735'),
+(35, 14, 9, 'CULTURA', '', 'PASTEUR 735'),
+(36, 14, 10, 'DIRECCION EJECUTIVA', '', 'PASTEUR 735'),
+(37, 14, 11, 'ESPACIO DE ARTE', '', 'Pasteur 633	'),
+(38, 14, 12, '	INFRAESTRUCTURA', '', 'Pasteur 633'),
+(39, 14, 13, 'JUBILADOS', '', 'URIBURU 650'),
+(40, 14, 14, 'JUVENTUD', '', 'PASTEUR 735'),
+(41, 14, 15, 'PROGRAMA SOCIALES', '', 'PASTEUR 735'),
+(42, 14, 16, 'RABINATO', '', 'PASTEUR 735'),
+(43, 14, 17, 'RECURSOS HUMANOS', '', 'PASTEUR 675'),
+(44, 14, 18, 'SECRETARIA INSTITUCIONAL', '', 'PASTEUR 735'),
+(45, 14, 19, '	SEGURIDAD', '', 'PASTEUR 735'),
+(46, 14, 20, 'SERVICIO DE EMPLEO', '', 'PASTEUR 735'),
+(47, 14, 21, 'SERVICIOS COMUNITARIOS', '', 'PASTEUR 735'),
+(48, 14, 22, 'SOCIOS Y DESARROLLO', '', 'PASTEUR 735'),
+(49, 14, 23, 'VAAD HAJINUJ', '', 'PASTEUR 735'),
+(50, 14, 24, 'VAAD HAKEHILOT', '', 'Pasteur 633'),
+(51, 14, 25, 'ADMINISTRACION TESORERIA', '', 'Pasteur 633');
 
 -- --------------------------------------------------------
 
@@ -316,9 +416,34 @@ CREATE TABLE `cuenta_empresa` (
   `dir` varchar(50) NOT NULL,
   `cuit` varchar(20) DEFAULT NULL,
   `inc_brutos` varchar(20) DEFAULT NULL,
-  `contacto_1` varchar(50) NOT NULL,
-  `cel_1` int(10) NOT NULL,
+  `contacto_1` varchar(50) DEFAULT NULL,
+  `cel_1` int(10) DEFAULT NULL,
   `id_centro_de_costo` int(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `cuenta_empresa`
+--
+
+INSERT INTO `cuenta_empresa` (`id`, `id_empresa`, `razon_social`, `dir`, `cuit`, `inc_brutos`, `contacto_1`, `cel_1`, `id_centro_de_costo`) VALUES
+(12, 14, 'ALEGRE EN FLOR', 'FELIPE VALLESE 501-CABA', '27920804867', '27920804867', NULL, 1122604527, 0),
+(13, 5032, 'ALGEIBA S.A.', 'PARANA 771 1Âº B', '20129904187', NULL, NULL, NULL, 0),
+(14, 17, 'AMIA', 'Pasteur 633', '33333334532', NULL, NULL, NULL, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pasajeros_cc`
+--
+
+CREATE TABLE `pasajeros_cc` (
+  `id` int(11) NOT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `id_cc` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `celular` varchar(30) DEFAULT NULL,
+  `email` varchar(50) NOT NULL,
+  `horario` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -508,12 +633,6 @@ ALTER TABLE `00_ubicaciones`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `autorizantes`
---
-ALTER TABLE `autorizantes`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indices de la tabla `autorizantes_cc`
 --
 ALTER TABLE `autorizantes_cc`
@@ -536,6 +655,12 @@ ALTER TABLE `choferes`
 -- Indices de la tabla `cuenta_empresa`
 --
 ALTER TABLE `cuenta_empresa`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `pasajeros_cc`
+--
+ALTER TABLE `pasajeros_cc`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -573,22 +698,16 @@ ALTER TABLE `00_ubicaciones`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
 
 --
--- AUTO_INCREMENT de la tabla `autorizantes`
---
-ALTER TABLE `autorizantes`
-  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
 -- AUTO_INCREMENT de la tabla `autorizantes_cc`
 --
 ALTER TABLE `autorizantes_cc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT de la tabla `centros_costo`
 --
 ALTER TABLE `centros_costo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT de la tabla `choferes`
@@ -600,7 +719,13 @@ ALTER TABLE `choferes`
 -- AUTO_INCREMENT de la tabla `cuenta_empresa`
 --
 ALTER TABLE `cuenta_empresa`
-  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `pasajeros_cc`
+--
+ALTER TABLE `pasajeros_cc`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `ubicaciones`

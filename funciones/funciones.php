@@ -412,7 +412,7 @@ function obtenerEmpresas()
 {
     $pdo = conexion();
 
-    $sql = "SELECT * FROM cuenta_empresa ORDER BY id_empresa ASC";
+    $sql = "SELECT * FROM cuenta_empresa ORDER BY razon_social ASC";
     return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
 

@@ -440,7 +440,7 @@ $empresas = obtenerEmpresas();
 
                         comboCC.innerHTML +=
                             '<option value="' + cc.id + '">' +
-                            cc.nombre +
+                            cc.centro_de_costo + ' - ' + cc.nombre +
                             '</option>';
 
                     });

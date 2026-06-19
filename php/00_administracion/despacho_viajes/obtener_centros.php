@@ -1,21 +1,30 @@
 <?php
-include_once "../../../funciones/funciones.php";
+require_once "../../../funciones/funciones.php";
+protegerPagina([0, 3]);
 
-$id_empresa = (int)($_GET['id_empresa'] ?? 0);
+header('Content-Type: application/json; charset=utf-8');
 
-$pdo = conexion();
+if (isset($_GET['id_empresa']) && $_GET['id_empresa'] !== '') {
+    // SE QUITA EL (int) por si es un string/CUIT. PDO lo parametriza de forma segura.
+    $id_empresa = $_GET['id_empresa']; 
 
-$sql = "
-    SELECT id,
-           centro_de_costo,
-           nombre
-    FROM centro_costos
-    WHERE id_empresa = ?
-    ORDER BY nombre
-";
+    try {
+        $pdo = conexion(); 
+        
+        $sql = "SELECT id, centro_de_costo, nombre 
+                FROM centros_costo 
+                WHERE id_empresa = ? 
+                ORDER BY nombre";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$id_empresa]);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id_empresa]);
+        
+        // Forzamos FETCH_ASSOC para que JSON no duplique índices numéricos
+        $centros = $stmt->fetchAll(PDO::FETCH_ASSOC); 
 
-header('Content-Type: application/json');
-echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        echo json_encode($centros);
+    } catch (PDOException $e) {
+        echo json_encode(["error" => "Error en la consulta", "detalle" => $e->getMessage()]);
+    }
+    exit;
+}

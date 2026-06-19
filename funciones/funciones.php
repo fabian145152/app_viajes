@@ -901,7 +901,7 @@ function borrarCentroCosto($id)
     // Verificar autorizantes del centro de costo
     $stmt = $pdo->prepare("
         SELECT COUNT(*)
-        FROM autorizantes_cc
+        FROM autorizantes
         WHERE id_cc = ?
     ");
     $stmt->execute([$id]);
@@ -927,7 +927,7 @@ function guardarAutorizante($data)
 
     if (!empty($data['id'])) {
 
-        $sql = "UPDATE autorizantes_cc SET
+        $sql = "UPDATE autorizantes SET
                     nombre=?,
                     celular=?,
                     email=?,
@@ -945,7 +945,7 @@ function guardarAutorizante($data)
         ]);
     } else {
 
-        $sql = "INSERT INTO autorizantes_cc
+        $sql = "INSERT INTO autorizantes
                 (
                     id_empresa,
                     id_cc,
@@ -974,7 +974,7 @@ function obtenerAutorizantesPorCC($id_cc)
     $pdo = conexion();
 
     $sql = "SELECT *
-            FROM autorizantes_cc
+            FROM autorizantes
             WHERE id_cc=?
             ORDER BY nombre";
 
@@ -989,7 +989,7 @@ function obtenerAutorizantePorId($id)
     $pdo = conexion();
 
     $stmt = $pdo->prepare(
-        "SELECT * FROM autorizantes_cc WHERE id=?"
+        "SELECT * FROM autorizantes WHERE id=?"
     );
 
     $stmt->execute([$id]);
@@ -1002,7 +1002,7 @@ function borrarAutorizante($id)
     $pdo = conexion();
 
     $stmt = $pdo->prepare(
-        "DELETE FROM autorizantes_cc WHERE id=?"
+        "DELETE FROM autorizantes WHERE id=?"
     );
 
     return $stmt->execute([$id]);

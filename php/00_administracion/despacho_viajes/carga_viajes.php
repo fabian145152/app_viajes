@@ -123,7 +123,7 @@ $empresas = obtenerEmpresas();
                         <select name="cc" id="cc" required>
                             <option value="">-- Seleccione Empresa --</option>
                             <?php foreach ($empresas as $empresa): ?>
-                                <option value="<?= $empresa['id_empresa'] ?>" <?= (($viaje['id_empresa'] ?? '') == $empresa['id_empresa']) ? 'selected' : '' ?>>
+                                <option value="<?= $empresa['id'] ?>" <?= (($viaje['cc'] ?? '') == $empresa['id']) ? 'selected' : '' ?>>
                                     <?= $empresa['id_empresa'] ?> - <?= htmlspecialchars($empresa['razon_social']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -152,6 +152,15 @@ $empresas = obtenerEmpresas();
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label>Nombre del Pasajero</label>
+                        <input type="text" name="nombre_pasaj" id="nombre_pasaj" value="<?= htmlspecialchars($viaje['nombre_pasaj'] ?? '') ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Celular del Pasajero</label>
+                        <input type="text" name="cel_pasaj" id="cel_pasaj" value="<?= htmlspecialchars($viaje['cel_pasaj'] ?? '') ?>" required>
+                    </div>
                     <div class="form-group">
                         <label>Observaciones Operador</label>
                         <textarea name="obs_operador" rows="3"><?= $viaje['obs_operador'] ?? '' ?></textarea>
@@ -226,7 +235,12 @@ $empresas = obtenerEmpresas();
                 <div class="form-full acciones-form">
                     <button type="submit" name="guardar" class="btn-guardar">💾 Guardar Viaje</button>
                     <a href="lista_viajes.php" class="btn-volver">↩ Volver</a>
+
+                    <a href="../../inicio_0.php" class="btn-volver">
+                        ↩ Salir
+                    </a>
                 </div>
+
             </form>
 
         </div>
@@ -368,6 +382,10 @@ $empresas = obtenerEmpresas();
                                 comboAut.innerHTML = '<option value="">No hay autorizantes activos</option>';
                                 return;
                             }
+
+                            // 💾 Guardamos la lista temporalmente en el navegador
+                            window.autorizantesCargados = datos;
+
                             datos.forEach(a => {
                                 let esSelected = (autPreseleccionado == a.id) ? 'selected' : '';
                                 let tel = a.celular ? ' - ' + formatearCelular(a.celular) : '';
@@ -385,6 +403,17 @@ $empresas = obtenerEmpresas();
                     comboAut.innerHTML = '<option value="">Error de Red</option>';
                 });
         }
+        // Escucha cuando el operador cambia manualmente de autorizante para auto-completar los inputs
+        document.getElementById('id_autorizante').addEventListener('change', function() {
+            let idSeleccionado = this.value;
+            if (idSeleccionado && window.autorizantesCargados) {
+                let autorizante = window.autorizantesCargados.find(a => a.id == idSeleccionado);
+                if (autorizante) {
+                    document.getElementById('nombre_pasaj').value = autorizante.nombre;
+                    document.getElementById('cel_pasaj').value = autorizante.celular || '';
+                }
+            }
+        });
     </script>
 </body>
 

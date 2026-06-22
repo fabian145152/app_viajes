@@ -556,7 +556,28 @@ function borrarEmpresa($id)
 //---------------------------------------------------------------
 //---------------------------------------------------------------
 
+function borrarCentroCosto($id)
+{
+    $pdo = conexion();
 
+    try {
+        // 1. Validamos si el centro de costo tiene autorizantes asignados
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM autorizantes WHERE id_cc = ?");
+        $stmtCheck->execute([$id]);
+
+        if ($stmtCheck->fetchColumn() > 0) {
+            return "No se puede eliminar este Centro de Costo porque tiene autorizantes asociados. Elimina primero sus autorizantes.";
+        }
+
+        // 2. Si está limpio, procedemos a borrarlo
+        $stmt = $pdo->prepare("DELETE FROM centros_costo WHERE id = ?");
+        $stmt->execute([$id]);
+
+        return true;
+    } catch (PDOException $e) {
+        return "Error en la base de datos al eliminar: " . $e->getMessage();
+    }
+}
 
 function obtenerCentrosCosto($id_empresa)
 {
@@ -594,23 +615,6 @@ function obtenerAutorizantes()
 
 
 
-// obtenerViajes: Trae todos los despachos
-/*
-function obtenerViajes()
-{
-    global $db;
-
-    $sql = "SELECT * FROM viajes_despacho ORDER BY 
-    CASE WHEN diferido = 'No' THEN 0 ELSE 1 END,
-    CASE WHEN diferido = 'No' THEN id END ASC,
-    fecha ASC,
-    hora ASC";
-
-    return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-}
-*/
-// obtenerVianes modificada
-
 function obtenerViajes()
 {
     global $db;
@@ -620,7 +624,7 @@ function obtenerViajes()
                 ce.razon_social AS empresa
             FROM viajes_despacho vd
             LEFT JOIN cuenta_empresa ce
-                ON vd.cc = ce.numero_cuenta
+                ON vd.cc = ce.id
             ORDER BY
                 CASE WHEN vd.diferido = 'No' THEN 0 ELSE 1 END,
                 CASE WHEN vd.diferido = 'No' THEN vd.id END ASC,
@@ -629,18 +633,6 @@ function obtenerViajes()
 
     return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
-/*
-function obtenerEmpresas()
-{
-    global $db;
-
-    $sql = "SELECT numero_cuenta, razon_social
-            FROM cuenta_empresa
-            ORDER BY razon_social";
-
-    return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-}
-*/
 
 // obtenerViajePorId: Para cargar los datos al editar
 function obtenerViajePorId($id)
@@ -708,6 +700,8 @@ function guardarViaje($datos)
     $destino_lat = $destino['lat'] ?? null;
     $destino_lng = $destino['lng'] ?? null;
 
+    // 🌟 Validar centro_de_costo: si no viene o viene vacío, le asignamos 0 por defecto
+    $centro_de_costo = !empty($datos['centro_de_costo']) ? (int)$datos['centro_de_costo'] : 0;
 
     if (!empty($datos['id'])) {
 
@@ -727,7 +721,8 @@ function guardarViaje($datos)
                     fecha=?,
                     hora=?,
                     categoria_movil=?,
-                    cc=?
+                    cc=?,
+                    centro_de_costo=? -- 👈 Agregado aquí
                 WHERE id=?";
 
         $stmt = $db->prepare($sql);
@@ -748,7 +743,8 @@ function guardarViaje($datos)
             $datos['hora'],
             $datos['categoria_movil'],
             $datos['cc'],
-            $datos['id'] // 👈 ESTE FALTABA
+            $centro_de_costo, // 👈 Agregado aquí
+            $datos['id']
         ]);
     } else {
 
@@ -768,9 +764,10 @@ function guardarViaje($datos)
                     fecha,
                     hora,
                     categoria_movil,
-                    cc)
+                    cc,
+                    centro_de_costo) -- 👈 Agregado aquí
                 VALUES
-                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // 👈 Agregado un '?' extra (ahora son 16)
 
         $stmt = $db->prepare($sql);
 
@@ -789,8 +786,8 @@ function guardarViaje($datos)
             $datos['fecha'],
             $datos['hora'],
             $datos['categoria_movil'],
-            $datos['cc']
-            //$datos['id'] // 👈 ESTE FALTABA
+            $datos['cc'],
+            $centro_de_costo // 👈 Agregado aquí
         ]);
     }
 }
@@ -809,13 +806,8 @@ function obtenerCentrosCostoPorEmpresa($id_empresa)
 {
     $pdo = conexion();
 
-    $sql = "SELECT cc.*,
-                   ce.razon_social
-            FROM centros_costo cc
-            INNER JOIN cuenta_empresa ce
-                ON cc.id_empresa = ce.id
-            WHERE cc.id_empresa = ?
-            ORDER BY cc.centro_de_costo";
+    // CORRECCIÓN: Cambiar cc.centro_de_costo por nombre o cc.nombre
+    $sql = "SELECT * FROM centros_costo WHERE id_empresa = ? ORDER BY nombre ASC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_empresa]);
@@ -838,16 +830,21 @@ function obtenerCentroCostoPorId($id)
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+
+
 function guardarCentroCosto($data)
 {
     $pdo = conexion();
+
+    $observaciones = $data['obs'] ?? '';
+    $direccion = $data['direccion'] ?? '';
 
     if (!empty($data['id'])) {
 
         // EDITAR
         $sql = "UPDATE centros_costo SET
                     nombre = ?,
-                    obs = ?,
+                    observaciones = ?,
                     direccion = ?
                 WHERE id = ?";
 
@@ -855,70 +852,40 @@ function guardarCentroCosto($data)
 
         return $stmt->execute([
             $data['nombre'],
-            $data['obs'],
-            $data['direccion'],
+            $observaciones,
+            $direccion,
             $data['id']
         ]);
     } else {
 
-        // GENERAR PRÓXIMO CÓDIGO AUTOMÁTICO
-        $sql = "SELECT COALESCE(MAX(centro_de_costo),0)+1 AS nuevo
-                FROM centros_costo
-                WHERE id_empresa = ?";
+        // INSERTAR 
+        $sql_max = "SELECT COALESCE(MAX(id_centro_costo), 0) + 1 AS nuevo FROM centros_costo WHERE id_empresa = ?";
+        $stmt_max = $pdo->prepare($sql_max);
+        $stmt_max->execute([$data['id_empresa']]);
+        $nuevo_id_cc = $stmt_max->fetchColumn();
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$data['id_empresa']]);
-
-        $codigo = $stmt->fetch(PDO::FETCH_ASSOC)['nuevo'];
-
-        // INSERTAR
         $sql = "INSERT INTO centros_costo
                 (
                     id_empresa,
-                    centro_de_costo,
+                    id_centro_costo,
                     nombre,
-                    obs,
-                    direccion
+                    direccion,
+                    contacto_centro,
+                    cel,
+                    observaciones
                 )
-                VALUES (?, ?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, '', 0, ?)";
 
         $stmt = $pdo->prepare($sql);
 
         return $stmt->execute([
             $data['id_empresa'],
-            $codigo,
+            $nuevo_id_cc,
             $data['nombre'],
-            $data['obs'],
-            $data['direccion']
+            $direccion,
+            $observaciones
         ]);
     }
-}
-
-function borrarCentroCosto($id)
-{
-    $pdo = conexion();
-
-    // Verificar autorizantes del centro de costo
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*)
-        FROM autorizantes
-        WHERE id_cc = ?
-    ");
-    $stmt->execute([$id]);
-
-    if ($stmt->fetchColumn() > 0) {
-        return "El centro de costo tiene autorizantes asociados. Debe eliminarlos antes de borrar el centro de costo.";
-    }
-
-    // Borrar centro de costo
-    $stmt = $pdo->prepare("
-        DELETE FROM centros_costo
-        WHERE id = ?
-    ");
-
-    $stmt->execute([$id]);
-
-    return true;
 }
 
 function guardarAutorizante($data)
@@ -926,16 +893,10 @@ function guardarAutorizante($data)
     $pdo = conexion();
 
     if (!empty($data['id'])) {
-
         $sql = "UPDATE autorizantes SET
-                    nombre=?,
-                    celular=?,
-                    email=?,
-                    horario=?
+                    nombre=?, celular=?, email=?, horario=?
                 WHERE id=?";
-
         $stmt = $pdo->prepare($sql);
-
         return $stmt->execute([
             $data['nombre'],
             $data['celular'],
@@ -944,20 +905,12 @@ function guardarAutorizante($data)
             $data['id']
         ]);
     } else {
-
+        // Corrección: La columna se llama id_centro_costo, no id_cc. 
+        // Agregamos estado = 1 para que aparezca por defecto.
         $sql = "INSERT INTO autorizantes
-                (
-                    id_empresa,
-                    id_cc,
-                    nombre,
-                    celular,
-                    email,
-                    horario
-                )
-                VALUES (?, ?, ?, ?, ?, ?)";
-
+                (id_empresa, id_centro_costo, nombre, celular, email, horario, estado)
+                VALUES (?, ?, ?, ?, ?, ?, 1)";
         $stmt = $pdo->prepare($sql);
-
         return $stmt->execute([
             $data['id_empresa'],
             $data['id_cc'],
@@ -972,15 +925,10 @@ function guardarAutorizante($data)
 function obtenerAutorizantesPorCC($id_cc)
 {
     $pdo = conexion();
-
-    $sql = "SELECT *
-            FROM autorizantes
-            WHERE id_cc=?
-            ORDER BY nombre";
-
+    // Corrección: La columna es id_centro_costo
+    $sql = "SELECT * FROM autorizantes WHERE id_centro_costo=? ORDER BY nombre";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_cc]);
-
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 

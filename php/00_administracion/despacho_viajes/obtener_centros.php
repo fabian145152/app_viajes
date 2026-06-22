@@ -5,22 +5,22 @@ protegerPagina([0, 3]);
 header('Content-Type: application/json; charset=utf-8');
 
 if (isset($_GET['id_empresa']) && $_GET['id_empresa'] !== '') {
-    // SE QUITA EL (int) por si es un string/CUIT. PDO lo parametriza de forma segura.
-    $id_empresa = $_GET['id_empresa']; 
+    $id_empresa = $_GET['id_empresa'];
 
     try {
-        $pdo = conexion(); 
-        
-        $sql = "SELECT id, centro_de_costo, nombre 
-                FROM centros_costo 
-                WHERE id_empresa = ? 
-                ORDER BY nombre";
+        $pdo = conexion();
+
+        // CORRECCIÓN: Se quitó 'centro_de_costo' ya que el campo correcto es 'nombre'
+        // Dentro de tu archivo obtener_centros.php cambia la consulta para que quede así:
+        $sql = "SELECT id, id_centro_costo, nombre 
+        FROM centros_costo 
+        WHERE id_empresa = ? 
+        ORDER BY nombre";
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$id_empresa]);
-        
-        // Forzamos FETCH_ASSOC para que JSON no duplique índices numéricos
-        $centros = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+
+        $centros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode($centros);
     } catch (PDOException $e) {

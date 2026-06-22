@@ -197,7 +197,7 @@ usort($viajes, function ($a, $b) {
 
                 <a href="carga_viajes.php">+ Nuevo Viaje</a>
 
-                <a href="mapa_de_viajes.php" target="_blank">Mapa</a>
+                <a href="../../01_mapeo/mapa_de_viajes.php" target="_blank">Mapa</a>
 
                 <a href="lista_viajes.php">
                     Todos (<?= count($viajes) ?>)

@@ -119,6 +119,8 @@ $empresas = obtenerEmpresas();
                         placeholder="Celular"
                         value="<?= $empresa['cel_1'] ?? '' ?>">
 
+
+
                     <button
                         type="submit"
                         name="guardar"
@@ -156,6 +158,7 @@ $empresas = obtenerEmpresas();
                             <th>Dirección</th>
                             <th>CUIT</th>
                             <th>Ing. Brutos</th>
+
                             <th>Acciones</th>
                             <th>Centro de Costos</th>
                         </tr>
@@ -192,6 +195,7 @@ $empresas = obtenerEmpresas();
                                 <td>
                                     <?= htmlspecialchars($e['inc_brutos'] ?? '-') ?>
                                 </td>
+
 
                                 <td>
 

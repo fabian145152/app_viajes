@@ -97,7 +97,7 @@ $centros = obtenerCentrosCostoPorEmpresa($id_empresa);
 
                     <textarea
                         name="obs"
-                        placeholder="Observaciones"><?= $editar['obs'] ?? '' ?></textarea>
+                        placeholder="Observaciones"><?= htmlspecialchars($editar['observaciones'] ?? '') ?></textarea>
 
 
 
@@ -138,45 +138,25 @@ $centros = obtenerCentrosCostoPorEmpresa($id_empresa);
                         <?php foreach ($centros as $c): ?>
 
                             <tr>
-                                <? $c['id'] ?>
-
-                                <td><?= htmlspecialchars($c['razon_social']) ?></td>
-
-                                <? $c['centro_de_costo'] ?>
+                                <td><?= htmlspecialchars($empresa['razon_social']) ?></td>
                                 <td><?= htmlspecialchars($c['nombre']) ?></td>
-
-                                <!--                            <td><?= $c['centro_de_costo'] ?></td> -->
-
-                                <td><?= $c['direccion'] ?></td>
-                                <td><?= $c['obs'] ?></td>
+                                <td><?= htmlspecialchars($c['direccion'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($c['observaciones'] ?? '') ?></td>
 
                                 <td>
-
-                                    <a
-                                        href="?id_empresa=<?= $id_empresa ?>&editar=<?= $c['id'] ?>"
-                                        class="btn btn-warning">
+                                    <a href="?id_empresa=<?= $id_empresa ?>&editar=<?= $c['id'] ?>" class="btn btn-warning">
                                         Editar
                                     </a>
-
-                                    <a
-                                        href="?id_empresa=<?= $id_empresa ?>&borrar=<?= $c['id'] ?>"
-                                        class="btn btn-danger"
-                                        onclick="return confirm('¿Eliminar?')">
+                                    <a href="?id_empresa=<?= $id_empresa ?>&borrar=<?= $c['id'] ?>" class="btn btn-danger" onclick="return confirm('¿Eliminar?')">
                                         Borrar
                                     </a>
-
                                 </td>
 
                                 <td>
-
-                                    <a
-                                        href="autorizantes_cc.php?id_empresa=<?= $id_empresa ?>&id_cc=<?= $c['id'] ?>"
-                                        class="btn btn-success">
+                                    <a href="autorizantes_cc.php?id_empresa=<?= $id_empresa ?>&id_cc=<?= $c['id'] ?>" class="btn btn-success">
                                         Autorizantes
                                     </a>
-
                                 </td>
-
                             </tr>
 
                         <?php endforeach; ?>

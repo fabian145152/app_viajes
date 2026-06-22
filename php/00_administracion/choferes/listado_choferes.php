@@ -51,6 +51,9 @@ $choferes = obtenerChoferes();
 
                     <input type="hidden" name="id" value="<?php echo $chofer_a_editar['id'] ?? ''; ?>">
 
+                    <input type="text" name="movil" placeholder="Movil"
+                        value="<?php echo $chofer_a_editar['movil'] ?? ''; ?>" required>
+
                     <input type="text" name="nombre" placeholder="Nombre"
                         value="<?php echo $chofer_a_editar['nombre'] ?? ''; ?>" required>
 
@@ -86,6 +89,7 @@ $choferes = obtenerChoferes();
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Movil</th>
                             <th>Apellido</th>
                             <th>Nombre</th>
                             <th>Vehículos</th>
@@ -103,6 +107,7 @@ $choferes = obtenerChoferes();
                             <?php foreach ($choferes as $c): ?>
                                 <tr>
                                     <td><?php echo $c['id']; ?></td>
+                                    <td><?php echo htmlspecialchars($c['movil']); ?></td>
                                     <td><?php echo htmlspecialchars($c['apellido']); ?></td>
                                     <td><?php echo htmlspecialchars($c['nombre']); ?></td>
                                     <td>

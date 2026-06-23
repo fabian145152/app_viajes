@@ -955,3 +955,13 @@ function borrarAutorizante($id)
 
     return $stmt->execute([$id]);
 }
+
+function obtenerChoferesActivos()
+{
+    // 1. Llamamos a tu función conexion() para obtener la conexión activa
+    $conn = conexion();
+
+    // 2. Ejecutamos la consulta usando $conn
+    $stmt = $conn->query("SELECT id, nombre, apellido, movil FROM choferes WHERE movil IS NOT NULL AND movil != '' ORDER BY movil ASC");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}

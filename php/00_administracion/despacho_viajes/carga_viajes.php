@@ -234,7 +234,7 @@ $empresas = obtenerEmpresas();
 
                 <div class="form-full acciones-form">
                     <button type="submit" name="guardar" class="btn-guardar">💾 Guardar Viaje</button>
-                    <a href="lista_viajes.php" class="btn-volver">↩ Volver</a>
+                    <a href="lista_viajes.php" class="btn-volver">↩ Listado de viajes</a>
 
                     <a href="../../inicio_0.php" class="btn-volver">
                         ↩ Salir

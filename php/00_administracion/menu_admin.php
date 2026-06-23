@@ -31,9 +31,13 @@ $nombre_completo = $row['nom_apellido'] ?? '';
     <div>
         <ul>
             <li><a href="operadores/listado.php">OPERADORES</a></li>
-            
+            <br>
+            <li><a href="seteos/inicio.php">SETEOS DE TIEMPOS</a></li>
+            <br>
             <li><a href="">APP PASAJEROS</a></li>
+            <br>
             <li><a href="">RANGOS</a></li>
+            <br>
             <li><a href="../inicio_0.php">SALIR</a></li>
         </ul>
     </div>

@@ -220,7 +220,7 @@ $empresas = obtenerEmpresas();
                         💾 Guardar Viaje
                     </button>
                     <a href="lista_viajes.php" class="btn-volver">
-                        ↩ Volver
+                        ↩ Listado de viajes
                     </a>
                     <a href="../../inicio_0.php" class="btn-volver">
                         ↩ Salir

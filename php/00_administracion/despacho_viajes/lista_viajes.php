@@ -2,6 +2,35 @@
 include_once "../../../funciones/funciones.php";
 protegerPagina([0, 3]);
 
+// Pasar diferidos a pendientes
+// Pasar diferidos a inmediatos
+$conn = conexion();
+include_once "../seteos/min_diferido.php";
+
+// Nota: Asegúrate de que dentro de 'min_diferido.php' se le asigne un valor numérico a $min_diferido (ej: $min_diferido = 15;)
+
+echo "Minutos Diferido: " . $min_diferido . "<br>";
+
+$min_diferido = $min_diferido - 1;
+
+
+
+echo "<strong>Hora del Servidor: </strong>" . date('H:i:s');
+//echo "<strong>Zona Horaria PHP:</strong> " . date_default_timezone_get();
+
+
+$sql = "UPDATE viajes_despacho
+SET estado = CASE
+    WHEN TIMESTAMPDIFF(MINUTE, NOW(), TIMESTAMP(fecha, hora)) > ? THEN 'Diferido'
+    ELSE 'Inmediato'
+END
+WHERE estado IN ('Diferido', 'Inmediato')
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->execute([$min_diferido]);
+
+
 // BORRAR DIRECTO (Si todavía usás el botón clásico por GET)
 if (isset($_GET['borrar'])) {
     borrarViaje((int)$_GET['borrar']);
@@ -101,13 +130,10 @@ usort($viajes, function ($a, $b) {
 <head>
     <meta charset="UTF-8">
     <title>Listado de Viajes</title>
-
     <link rel="stylesheet" href="../../../css/estilos.css">
     <link rel="stylesheet" href="../../../css/listado_viajes.css">
     <link rel="stylesheet" href="lista_viajes.css">
-    <style>
-
-    </style>
+    <meta http-equiv="refresh" content="30">
 </head>
 
 <body>

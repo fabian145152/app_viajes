@@ -124,3 +124,23 @@
                 width: 100%;
             }
         }
+
+        /* Estilos base para los botones selectores */
+.btn-switch {
+    flex: 1;
+    padding: 12px 15px;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    background-color: #f8f9fa;
+    color: #495057;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.btn-switch:hover {
+    background-color: #e2e6ea;
+}
+

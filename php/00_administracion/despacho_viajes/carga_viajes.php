@@ -29,7 +29,191 @@ $empresas = obtenerEmpresas();
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="listado_viajes.js" defer></script>
 
+    <style>
+        /* 🎨 ESTILOS PARA LOS BOTONES DE ESTADO (MODALIDAD) */
+        .grupo-botones-estado {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .btn-switch {
+            flex: 1;
+            padding: 12px 15px;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid #ccc;
+            background-color: #f8f9fa;
+            color: #495057;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-switch:hover {
+            background-color: #e2e6ea;
+        }
+
+        .btn-switch.activo-inmediato {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0a58ca;
+            box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
+        }
+
+        .btn-switch.activo-diferido {
+            background-color: #fd7e14;
+            color: white;
+            border-color: #e46a06;
+            box-shadow: 0 0 5px rgba(253, 126, 20, 0.5);
+        }
+
+        /* 🚗 🚀 ESTILOS COMPACTOS Y ALINEADOS EN FILA PARA CATEGORÍAS */
+        .grid-categorias {
+            display: flex;
+            /* Cambiado a flex para alinearlos uno al lado del otro */
+            gap: 8px;
+            /* Espaciado más corto entre tarjetas */
+            margin-top: 5px;
+            flex-wrap: nowrap;
+            /* Fuerza a que se mantengan siempre en la misma línea */
+        }
+
+        .tarjeta-categoria {
+            flex: 1;
+            max-width: 105px;
+            /* Limita el ancho máximo para hacer el recuadro más chico */
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 5px 4px;
+            /* Reducido al mínimo para achicar el recuadro */
+            text-align: center;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tarjeta-categoria:hover {
+            border-color: #bbb;
+            background-color: #f1f3f5;
+            transform: scale(1.02);
+        }
+
+        .tarjeta-categoria img {
+            width: 85px;
+            /* Conserva exactamente el tamaño de tu imagen */
+            height: 55px;
+            object-fit: contain;
+            margin-bottom: 2px;
+            /* Pegamos un poco más el texto a la imagen */
+        }
+
+        .tarjeta-categoria span {
+            font-weight: bold;
+            font-size: 11px;
+            /* Texto sutilmente más chico para acompañar la caja */
+            color: #495057;
+            text-transform: uppercase;
+        }
+
+        /* Estado Seleccionado / Activo */
+        .tarjeta-categoria.activa {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+            box-shadow: 0 0 6px rgba(13, 110, 253, 0.4);
+        }
+
+        .tarjeta-categoria.activa span {
+            color: #0d6efd;
+        }
+    </style>
+
     <script>
+        const editandoViaje = <?= isset($viaje['id']) ? 'true' : 'false' ?>;
+
+        function fechaActual() {
+            const fecha = document.getElementById("fecha");
+            const hora = document.getElementById("hora");
+            if (!fecha || !hora) return;
+
+            const ahora = new Date();
+            const yyyy = ahora.getFullYear();
+            const mm = String(ahora.getMonth() + 1).padStart(2, '0');
+            const dd = String(ahora.getDate()).padStart(2, '0');
+            const hh = String(ahora.getHours()).padStart(2, '0');
+            const mi = String(ahora.getMinutes()).padStart(2, '0');
+
+            fecha.value = `${yyyy}-${mm}-${dd}`;
+            hora.value = `${hh}:${mi}`;
+        }
+
+        function seleccionarEstado(estado) {
+            const inputEstado = document.getElementById("estado_oculto");
+            const btnInmediato = document.getElementById("btn_inmediato");
+            const btnDiferido = document.getElementById("btn_diferido");
+            const contenedorFechaHora = document.getElementById("contenedor_fecha_hora");
+            const fecha = document.getElementById("fecha");
+            const hora = document.getElementById("hora");
+
+            if (!inputEstado || !btnInmediato || !btnDiferido || !contenedorFechaHora) return;
+
+            inputEstado.value = estado;
+
+            if (estado === 'Diferido') {
+                btnDiferido.classList.add('activo-diferido');
+                btnInmediato.classList.remove('activo-inmediato');
+                contenedorFechaHora.style.display = 'flex';
+                if (fecha && hora) {
+                    fecha.readOnly = false;
+                    hora.readOnly = false;
+                }
+            } else {
+                btnInmediato.classList.add('activo-inmediato');
+                btnDiferido.classList.remove('activo-diferido');
+                contenedorFechaHora.style.display = 'none';
+                if (!editandoViaje) {
+                    fechaActual();
+                }
+                if (fecha && hora) {
+                    fecha.readOnly = true;
+                    hora.readOnly = true;
+                }
+            }
+        }
+
+        function seleccionarCategoria(categoria) {
+            const inputCategoria = document.getElementById("categoria_movil_oculto");
+            if (!inputCategoria) return;
+
+            inputCategoria.value = categoria;
+
+            document.querySelectorAll('.tarjeta-categoria').forEach(tarjeta => {
+                tarjeta.classList.remove('activa');
+            });
+
+            const tarjetaSeleccionada = document.querySelector(`.tarjeta-categoria[data-categoria="${categoria}"]`);
+            if (tarjetaSeleccionada) {
+                tarjetaSeleccionada.classList.add('activa');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const inputEstado = document.getElementById("estado_oculto");
+            if (inputEstado) {
+                seleccionarEstado(inputEstado.value);
+            }
+
+            const inputCategoria = document.getElementById("categoria_movil_oculto");
+            if (inputCategoria && inputCategoria.value) {
+                seleccionarCategoria(inputCategoria.value);
+            }
+        });
+
         function formatearCelular(cel) {
             if (!cel) return '';
             cel = cel.toString().replace(/\D/g, '');
@@ -40,61 +224,6 @@ $empresas = obtenerEmpresas();
             }
             return cel;
         }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const diferido = document.getElementById("diferido");
-            const fecha = document.getElementById("fecha");
-            const hora = document.getElementById("hora");
-
-            const editando = <?= isset($viaje['id']) ? 'true' : 'false' ?>;
-
-            function fechaActual() {
-                const ahora = new Date();
-                const yyyy = ahora.getFullYear();
-                const mm = String(ahora.getMonth() + 1).padStart(2, '0');
-                const dd = String(ahora.getDate()).padStart(2, '0');
-                const hh = String(ahora.getHours()).padStart(2, '0');
-                const mi = String(ahora.getMinutes()).padStart(2, '0');
-
-                fecha.value = `${yyyy}-${mm}-${dd}`;
-                hora.value = `${hh}:${mi}`;
-            }
-
-            function actualizarFechaHora() {
-                if (!diferido) return;
-
-                if (diferido.value === "No") {
-                    if (!editando) {
-                        fechaActual();
-                    }
-                    fecha.readOnly = true;
-                    hora.readOnly = true;
-                } else {
-                    fecha.readOnly = false;
-                    hora.readOnly = false;
-                    if (!editando) {
-                        fecha.value = "";
-                        hora.value = "";
-                    }
-                }
-            }
-
-            if (diferido) {
-                diferido.addEventListener("change", function() {
-                    if (this.value === "No") {
-                        fechaActual();
-                        fecha.readOnly = true;
-                        hora.readOnly = true;
-                    } else {
-                        fecha.value = "";
-                        hora.value = "";
-                        fecha.readOnly = false;
-                        hora.readOnly = false;
-                    }
-                });
-                actualizarFechaHora();
-            }
-        });
     </script>
 </head>
 
@@ -132,7 +261,7 @@ $empresas = obtenerEmpresas();
 
                     <div class="form-group" id="contenedor_cc" style="display: <?= !empty($viaje['id_cc']) ? 'block' : 'none' ?>;">
                         <label>Centro de Costo</label>
-                        <select name="id_cc" id="id_cc" required>
+                        <select name="id_cc" id="id_cc">
                             <?php if (!empty($viaje['id_cc'])): ?>
                                 <option value="<?= $viaje['id_cc'] ?>" selected>Cargando centro guardado...</option>
                             <?php else: ?>
@@ -174,16 +303,16 @@ $empresas = obtenerEmpresas();
 
                 <div class="col">
                     <div class="form-group">
-                        <label>Estado</label>
-                        <select name="estado" id="estado" required>
-                            <option value="Pendiente" <?= (($viaje['estado'] ?? 'Pendiente') == 'Pendiente') ? 'selected' : '' ?>>Pendiente</option>
-                            <option value="Inmediato" <?= (($viaje['estado'] ?? '') == 'Inmediato') ? 'selected' : '' ?>>Inmediato</option>
-                            <option value="Asignado" <?= (($viaje['estado'] ?? '') == 'Asignado') ? 'selected' : '' ?>>Asignado</option>
-                            <option value="En Curso" <?= (($viaje['estado'] ?? '') == 'En Curso') ? 'selected' : '' ?>>En Curso</option>
-                            <option value="Diferido" <?= (($viaje['estado'] ?? '') == 'Diferido') ? 'selected' : '' ?>>Diferido</option>
-                            <option value="Completado" <?= (($viaje['estado'] ?? '') == 'Completado') ? 'selected' : '' ?>>Completado</option>
-                            <option value="Cancelado" <?= (($viaje['estado'] ?? '') == 'Cancelado') ? 'selected' : '' ?>>Cancelado</option>
-                        </select>
+                        <label>Estado / Modalidad del Viaje</label>
+                        <div class="grupo-botones-estado">
+                            <button type="button" id="btn_inmediato" class="btn-switch" onclick="seleccionarEstado('Inmediato')">
+                                ⚡ Inmediato
+                            </button>
+                            <button type="button" id="btn_diferido" class="btn-switch" onclick="seleccionarEstado('Diferido')">
+                                📅 Diferido
+                            </button>
+                        </div>
+                        <input type="hidden" name="estado" id="estado_oculto" value="<?= $viaje['estado'] ?? 'Inmediato' ?>">
                     </div>
 
                     <div class="form-group">
@@ -211,35 +340,49 @@ $empresas = obtenerEmpresas();
                         <input type="hidden" name="destino_lng" id="dir_destino_lng" value="<?= $viaje['destino_lng'] ?? '' ?>">
                     </div>
 
-                    <div class="fecha-hora">
+                    <div class="fecha-hora" id="contenedor_fecha_hora">
                         <input type="date" name="fecha" id="fecha" value="<?= $viaje['fecha'] ?? date('Y-m-d') ?>">
                         <input type="time" name="hora" id="hora" value="<?= isset($viaje['hora']) ? substr($viaje['hora'], 0, 5) : date('H:i') ?>">
                     </div>
 
                     <div class="form-group">
-                        <label>Categoría</label>
-                        <select name="categoria_movil" id="categoria_movil" required>
-                            <option value="">-- ELIJA CATEGORÍA --</option>
-                            <option value="REMIS" <?= (($viaje['categoria_movil'] ?? '') == 'REMIS') ? 'selected' : '' ?>>REMIS</option>
-                            <option value="TAXI" <?= (($viaje['categoria_movil'] ?? '') == 'TAXI') ? 'selected' : '' ?>>TAXI</option>
-                            <option value="VAN" <?= (($viaje['categoria_movil'] ?? '') == 'VAN') ? 'selected' : '' ?>>VAN</option>
-                        </select>
-                    </div>
+                        <label>Categoría de Móvil</label>
+                        <div class="grid-categorias">
+                            <div class="tarjeta-categoria" data-categoria="REMIS" onclick="seleccionarCategoria('REMIS')">
+                                <img src="../../../img/sedan.png" alt="Sedán">
+                                <span>Sedán</span>
+                            </div>
 
+                            <div class="tarjeta-categoria" data-categoria="TAXI" onclick="seleccionarCategoria('TAXI')">
+                                <img src="../../../img/taxi.png" alt="Taxi">
+                                <span>Taxi</span>
+                            </div>
+
+                            <div class="tarjeta-categoria" data-categoria="VAN" onclick="seleccionarCategoria('VAN')">
+                                <img src="../../../img/van.png" alt="Van">
+                                <span>Van</span>
+                            </div>
+
+                            <div class="tarjeta-categoria" data-categoria="UTILITARIO" onclick="seleccionarCategoria('UTILITARIO')">
+                                <img src="../../../img/utilitario.png" alt="Utilitario">
+                                <span>Utilitario</span>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="categoria_movil" id="categoria_movil_oculto" value="<?= $viaje['categoria_movil'] ?? '' ?>" required>
+                    </div>
+                    <!-- 
                     <div id="bloque_tarifa" style="display:flex; gap:10px; align-items:center; margin-top:10px;">
                         <button type="button" class="btn-map btn-tarifa" style="min-width:200px;" onclick="calcularTarifa()">💲 CALCULAR VIAJE</button>
                         <input type="text" id="tarifa_resultado" placeholder="Importe $" readonly style="flex:1;">
                     </div>
                 </div>
-
-                <div class="form-full acciones-form">
-                    <button type="submit" name="guardar" class="btn-guardar">💾 Guardar Viaje</button>
-                    <a href="lista_viajes.php" class="btn-volver">↩ Listado de viajes</a>
-
-                    <a href="../../inicio_0.php" class="btn-volver">
-                        ↩ Salir
-                    </a>
-                </div>
+                            -->
+                    <div class="form-full acciones-form">
+                        <button type="submit" name="guardar" class="btn-guardar">💾 Guardar Viaje</button>
+                        <a href="lista_viajes.php" class="btn-volver">↩ Listado de viajes</a>
+                        <a href="../../inicio_0.php" class="btn-volver">↩ Salir</a>
+                    </div>
 
             </form>
 
@@ -254,7 +397,6 @@ $empresas = obtenerEmpresas();
     </div>
 
     <script>
-        // Lógica de compatibilidad si se abren registros en modo edición
         document.addEventListener("DOMContentLoaded", function() {
             let empresaPrevia = document.getElementById('cc').value;
             let ccPrevio = "<?= $viaje['id_cc'] ?? '' ?>";
@@ -262,42 +404,33 @@ $empresas = obtenerEmpresas();
 
             if (empresaPrevia) {
                 cargarCentros(empresaPrevia, ccPrevio, autPrevio);
+                cargarAutorizantes(ccPrevio, empresaPrevia, autPrevio);
             }
         });
 
-        // ===================================
-        // 1. ESCUCHA: CAMBIO DE EMPRESA
-        // ===================================
         document.getElementById('cc').addEventListener('change', function() {
             let empresa = this.value;
             cargarCentros(empresa, null, null);
+            cargarAutorizantes(null, empresa, null);
         });
 
         function cargarCentros(empresa, ccPreseleccionado, autPreseleccionado) {
             let contenedorCC = document.getElementById('contenedor_cc');
-            let contenedorAut = document.getElementById('contenedor_autorizante');
             let comboCC = document.getElementById('id_cc');
-            let comboAut = document.getElementById('id_autorizante');
 
             if (!empresa) {
                 contenedorCC.style.display = 'none';
-                contenedorAut.style.display = 'none';
                 comboCC.innerHTML = '<option value="">Seleccione Centro de Costo</option>';
-                comboAut.innerHTML = '<option value="">Seleccione Autorizante</option>';
                 return;
             }
 
-            // Desplegamos Centro de Costo secuencialmente
             contenedorCC.style.display = 'block';
-            if (!ccPreseleccionado) {
-                contenedorAut.style.display = 'none';
-            }
             comboCC.innerHTML = '<option value="">Cargando centros...</option>';
 
             fetch('obtener_centros.php?id_empresa=' + empresa)
                 .then(response => {
                     if (!response.ok) throw new Error('HTTP Status ' + response.status);
-                    return response.text(); // Capturamos texto para interceptar errores fatales de PHP
+                    return response.text();
                 })
                 .then(texto => {
                     try {
@@ -305,11 +438,10 @@ $empresas = obtenerEmpresas();
 
                         if (datos.error) {
                             comboCC.innerHTML = '<option value="">Error SQL: ' + datos.error + '</option>';
-                            console.error("Error devuelto desde la base de datos:", datos);
                             return;
                         }
 
-                        comboCC.innerHTML = '<option value="">-- Seleccione Centro de Costo --</option>';
+                        comboCC.innerHTML = '<option value="">-- Seleccione Centro de Costo (Opcional) --</option>';
                         if (Array.isArray(datos)) {
                             if (datos.length === 0) {
                                 comboCC.innerHTML = '<option value="">La empresa no registra centros</option>';
@@ -317,39 +449,35 @@ $empresas = obtenerEmpresas();
                             }
                             datos.forEach(cc => {
                                 let esSelected = (ccPreseleccionado == cc.id) ? 'selected' : '';
-                                comboCC.innerHTML += '<option value="' + cc.id + '" ' + esSelected + '>' + cc.centro_de_costo + ' - ' + cc.nombre + '</option>';
-                            });
+                                let codigoCentro = (cc.centro_de_costo !== undefined && cc.centro_de_costo !== null) ? cc.centro_de_costo + ' - ' : '';
+                                let nombreCentro = cc.nombre || '';
 
-                            if (ccPreseleccionado) {
-                                cargarAutorizantes(ccPreseleccionado, autPreseleccionado);
-                            }
+                                comboCC.innerHTML += '<option value="' + cc.id + '" ' + esSelected + '>' + codigoCentro + nombreCentro + '</option>';
+                            });
                         } else {
                             comboCC.innerHTML = '<option value="">Error: Datos corruptos</option>';
                         }
                     } catch (e) {
-                        console.error("El servidor no devolvió JSON limpio. Respuesta capturada:\n", texto);
-                        comboCC.innerHTML = '<option value="">Error: Ver Consola (F12)</option>';
+                        console.error("Respuesta inválida de centros:", texto);
+                        comboCC.innerHTML = '<option value="">Error al cargar centros</option>';
                     }
                 })
                 .catch(error => {
-                    console.error("Error de Red / Conexión fetch centros:", error);
                     comboCC.innerHTML = '<option value="">Error de Red</option>';
                 });
         }
 
-        // ===================================
-        // 2. ESCUCHA: CAMBIO DE CENTRO DE COSTO
-        // ===================================
         document.getElementById('id_cc').addEventListener('change', function() {
             let id_cc = this.value;
-            cargarAutorizantes(id_cc, null);
+            let empresa = document.getElementById('cc').value;
+            cargarAutorizantes(id_cc, empresa, null);
         });
 
-        function cargarAutorizantes(id_cc, autPreseleccionado) {
+        function cargarAutorizantes(id_cc, empresa, autPreseleccionado) {
             let contenedorAut = document.getElementById('contenedor_autorizante');
             let comboAut = document.getElementById('id_autorizante');
 
-            if (!id_cc) {
+            if (!empresa) {
                 contenedorAut.style.display = 'none';
                 comboAut.innerHTML = '<option value="">Seleccione Autorizante</option>';
                 return;
@@ -358,11 +486,7 @@ $empresas = obtenerEmpresas();
             contenedorAut.style.display = 'block';
             comboAut.innerHTML = '<option value="">Cargando autorizantes...</option>';
 
-            // CAPTURAMOS LA EMPRESA SELECCIONADA
-            let empresa = document.getElementById('cc').value;
-
-            // Enviamos AMBOS datos en el fetch
-            fetch('obtener_autorizantes.php?id_cc=' + id_cc + '&id_empresa=' + empresa)
+            fetch('obtener_autorizantes.php?id_cc=' + (id_cc || '') + '&id_empresa=' + empresa)
                 .then(response => {
                     if (!response.ok) throw new Error('HTTP Status ' + response.status);
                     return response.text();
@@ -383,7 +507,6 @@ $empresas = obtenerEmpresas();
                                 return;
                             }
 
-                            // 💾 Guardamos la lista temporalmente en el navegador
                             window.autorizantesCargados = datos;
 
                             datos.forEach(a => {
@@ -395,15 +518,15 @@ $empresas = obtenerEmpresas();
                             comboAut.innerHTML = '<option value="">Error: Datos corruptos</option>';
                         }
                     } catch (e) {
-                        console.error("Respuesta del servidor:\n", texto);
-                        comboAut.innerHTML = '<option value="">Error: Ver Consola</option>';
+                        console.error("Respuesta inválida de autorizantes:", texto);
+                        comboAut.innerHTML = '<option value="">Error al cargar autorizantes</option>';
                     }
                 })
                 .catch(error => {
                     comboAut.innerHTML = '<option value="">Error de Red</option>';
                 });
         }
-        // Escucha cuando el operador cambia manualmente de autorizante para auto-completar los inputs
+
         document.getElementById('id_autorizante').addEventListener('change', function() {
             let idSeleccionado = this.value;
             if (idSeleccionado && window.autorizantesCargados) {
@@ -411,6 +534,10 @@ $empresas = obtenerEmpresas();
                 if (autorizante) {
                     document.getElementById('nombre_pasaj').value = autorizante.nombre;
                     document.getElementById('cel_pasaj').value = autorizante.celular || '';
+
+                    if (autorizante.id_cc && !document.getElementById('id_cc').value) {
+                        document.getElementById('id_cc').value = autorizante.id_cc;
+                    }
                 }
             }
         });

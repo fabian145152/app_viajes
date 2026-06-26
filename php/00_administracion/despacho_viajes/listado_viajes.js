@@ -93,8 +93,7 @@ async function verRecorrido() {
 
     // DISTANCIA (km)
     let km = (route.distance / 1000).toFixed(2);
-   alert("Distancia: " + km + " km\nTiempo: " + Math.round(route.duration / 60) + " min\nTarifa aprox: " + (km * 1800).toFixed(0) + " ARS (Remis)\nTarifa aprox: " + (1920 + km * 192).toFixed(0) + " ARS (Taxi)");
-
+    alert("Distancia: " + km + " km\nTiempo: " + Math.round(route.duration / 60) + " min");
 }
 
 async function autocomplete(input) {
@@ -125,12 +124,8 @@ async function autocomplete(input) {
     });
 }
 
-
 //  AGREGADO 
-
-
 document.addEventListener("DOMContentLoaded", function () {
-
     const select = document.getElementById("diferido");
     const campos = document.getElementById("campos_diferido");
 
@@ -142,95 +137,4 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleCampos();
         select.addEventListener("change", toggleCampos);
     }
-
-});
-
-async function calcularTarifa() {
-
-
-    let lat1 = document.getElementById("dir_origen_lat").value;
-    let lon1 = document.getElementById("dir_origen_lng").value;
-
-    let lat2 = document.getElementById("dir_destino_lat").value;
-    let lon2 = document.getElementById("dir_destino_lng").value;
-
-    // 👉 categoría
-    let categoria = document.getElementById("categoria_movil").value;
-
-    // 🔴 VALIDACIÓN CLAVE
-    if (!lat1 || !lon1 || !lat2 || !lon2) {
-        return alert("Primero buscá origen y destino en el mapa (botones O y D)");
-    }
-
-    if (!categoria) {
-        return alert("Elegí categoría");
-    }
-
-    try {
-
-        let url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
-
-        let res = await fetch(url);
-        let data = await res.json();
-
-        console.log("Respuesta OSRM:", data);
-
-        if (!data.routes || data.routes.length === 0) {
-            return alert("No se pudo calcular la ruta");
-        }
-
-        let distanciaKm = data.routes[0].distance / 1000;
-
-        console.log("Distancia km:", distanciaKm);
-
-        let tarifa = 0;
-
-        // ================= REMIS =================
-        if (categoria === "REMIS") {
-
-            let valorRemis = 1800;
-            tarifa = distanciaKm * valorRemis;
-            console.log("Tarifa REMIS:", tarifa);
-        }
-
-        // ================= TAXI =================
-        else if (categoria === "TAXI") {
-
-            let bajada = 1920;
-            let valorKm = 192;
-            tarifa = bajada + (distanciaKm * valorKm);
-            console.log("Tarifa TAXI:", tarifa);
-        }
-
-        tarifa = Math.round(tarifa);
-
-        document.getElementById("tarifa_resultado").value = "$ " + tarifa;
-
-    } catch (error) {
-        console.error("Error tarifa:", error);
-        alert("Error al calcular tarifa");
-    }
-}
-
-// ================= TARIFA VISIBILIDAD =================
-document.addEventListener("DOMContentLoaded", function () {
-
-
-    const categoria = document.getElementById("categoria_movil");
-    const bloque = document.getElementById("bloque_tarifa");
-
-    if (!categoria || !bloque) return;
-
-    function toggleTarifa() {
-        if (categoria.value === "TAXI") {
-            bloque.style.display = "block";
-            
-        } else {
-            bloque.style.display = "none";
-            
-        }
-    }
-
-    toggleTarifa(); // al cargar (modo edición también)
-    categoria.addEventListener("change", toggleTarifa);
 });

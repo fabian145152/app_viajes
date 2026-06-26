@@ -116,124 +116,46 @@ async function verMapa(direccion) {
 
 
 // ================= VER RECORRIDO =================
-async function verRecorrido(origen, destino) {
+async function verRecorrido() {
+    let o = document.getElementById("dir_origen").value;
+    let d = document.getElementById("dir_destino").value;
 
-    origen = origen.trim();
-    destino = destino.trim();
+    if (!o || !d) return alert("Complete origen y destino");
 
-    if (!origen || !destino) {
-        return alert("Complete origen y destino");
-    }
+    let geoO = await geocodificar(o);
+    let geoD = await geocodificar(d);
 
-    let geoO = await geocodificar(origen);
-    let geoD = await geocodificar(destino);
-
-    if (!geoO || !geoD) {
-        return alert("Direcciones no encontradas");
-    }
+    if (!geoO || !geoD) return alert("Direcciones inválidas");
 
     abrirMapa();
-
-    let lat1 = geoO.lat;
-    let lon1 = geoO.lon;
-
-    let lat2 = geoD.lat;
-    let lon2 = geoD.lon;
-
-    if (!map) {
-        map = L.map('map').setView([lat1, lon1], 13);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-    }
-
+    initMap(geoO.lat, geoO.lon);
     limpiarMapa();
 
-    let m1 = L.marker([lat1, lon1]).addTo(map).bindPopup("Origen");
-    let m2 = L.marker([lat2, lon2]).addTo(map).bindPopup("Destino");
+    let m1 = L.marker([geoO.lat, geoO.lon]).addTo(map).bindPopup("Origen");
+    let m2 = L.marker([geoD.lat, geoD.lon]).addTo(map).bindPopup("Destino");
 
     markers.push(m1, m2);
 
-    try {
+    let url = `https://router.project-osrm.org/route/v1/driving/${geoO.lon},${geoO.lat};${geoD.lon},${geoD.lat}?overview=full&geometries=geojson`;
 
-        let url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson&alternatives=true`;
+    let res = await fetch(url);
+    let data = await res.json();
 
-        let res = await fetch(url);
-        let data = await res.json();
+    let route = data.routes[0];
 
-        console.log("Rutas:", data);
+    let layer = L.geoJSON(route.geometry, {
+        style: { color: 'blue', weight: 5 }
+    }).addTo(map);
 
-        if (!data.routes || data.routes.length === 0) {
-            return alert("No se encontró ruta");
-        }
+    rutas.push(layer);
+    map.fitBounds(layer.getBounds());
 
-        rutas = []; // limpiar array de rutas
+    // DISTANCIA (km)
+    let km = (route.distance / 1000).toFixed(2);
+    
+    // Se comenta el cálculo de tarifa para que no afecte el flujo
+    // let importe = calcularTarifa(km); 
 
-        data.routes.forEach((route, index) => {
-
-            let layer = L.geoJSON(route.geometry, {
-                style: {
-                    color: index === 0 ? 'blue' : 'gray',
-                    weight: index === 0 ? 6 : 4,
-                    opacity: index === 0 ? 1 : 0.5
-                }
-            }).addTo(map);
-
-            // 👉 CLICK EN RUTA
-            layer.on('click', function () {
-
-                rutas.forEach(r => r.setStyle({
-                    color: 'gray',
-                    weight: 4,
-                    opacity: 0.5
-                }));
-
-                this.setStyle({
-                    color: 'red',
-                    weight: 6,
-                    opacity: 1
-                });
-
-                // ✅ ACTUALIZA DISTANCIA SEGÚN RUTA SELECCIONADA
-                let km = route.distance / 1000;
-                window.distancia_km = km;
-
-                //console.log("Ruta seleccionada:", km.toFixed(2) + " km");
-                let km = data.routes[0].distance / 1000;
-
-                // variables
-                const remis = 1800;
-                const bajadaBandera = 500;
-
-                // cálculos
-                const importeRemis = km * remis;
-                const valorTaxi = km * bajadaBandera * (km / 5);
-
-                // mostrar todo junto
-                alert(
-                    "Distancia: " + km.toFixed(2) + " km\n" +
-                    "Importe Remis: $ " + importeRemis.toFixed(0) + "\n" +
-                    "Valor Taxi: $ " + valorTaxi.toFixed(0)
-                );
-                
-            });
-
-            rutas.push(layer);
-        });
-
-        // 👉 AJUSTAR MAPA
-        map.fitBounds(rutas[0].getBounds());
-
-        // ✅ DISTANCIA POR DEFECTO (primera ruta)
-        let km = data.routes[0].distance / 1000;
-        window.distancia_km = km;
-
-        console.log("Distancia inicial:", km.toFixed(2) + " km");
-
-    } catch (error) {
-        console.error("Error routing:", error);
-        alert("Error al calcular ruta");
-    }
+    // Alerta modificada: sin la línea del importe
+    alert("Distancia: " + km + " km\nTiempo: " + Math.round(route.duration / 60) + " min");
 }
-

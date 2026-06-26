@@ -562,7 +562,7 @@ function borrarCentroCosto($id)
 
     try {
         // 1. Validamos si el centro de costo tiene autorizantes asignados
-        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM autorizantes WHERE id_cc = ?");
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM autorizantes WHERE id = ?");
         $stmtCheck->execute([$id]);
 
         if ($stmtCheck->fetchColumn() > 0) {

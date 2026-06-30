@@ -1,0 +1,7 @@
+Fecha: 2026-06-29 16:50:08 | Lat: -34.6472134 | Lng: -58.4580893 | Movil: Sin Móvil | Estado: activo
+Fecha: 2026-06-29 16:50:09 | Lat: -34.6472134 | Lng: -58.4580893 | Movil: Sin Móvil | Estado: inactivo
+Fecha: 2026-06-29 16:50:10 | Lat: -34.6472134 | Lng: -58.4580893 | Movil: Sin Móvil | Estado: inactivo
+Fecha: 2026-06-29 16:50:11 | Lat: -34.6472134 | Lng: -58.4580893 | Movil: Sin Móvil | Estado: inactivo
+Fecha: 2026-06-29 16:51:47 | Lat: -34.6471446 | Lng: -58.4580811 | Movil: Sin Móvil | Estado: activo
+Fecha: 2026-06-29 16:51:47 | Lat: -34.6471446 | Lng: -58.4580811 | Movil: Sin Móvil | Estado: inactivo
+Fecha: 2026-06-29 16:51:47 | Lat: -34.6471446 | Lng: -58.4580811 | Movil: Sin Móvil | Estado: inactivo
